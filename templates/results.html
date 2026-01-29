@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer - Results</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: #e0e0e0; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { color: #00d2ff; text-align: center; }
+        .result-card { background: #2d2d2d; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-left: 5px solid #00d2ff; }
+        .score { font-size: 24px; font-weight: bold; color: #00ff88; }
+        .btn { display: inline-block; padding: 10px 20px; background: #00d2ff; color: #1a1a1a; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analysis Results</h1>
+        {% for analysis in analyses %}
+        <div class="result-card">
+            <h2>{{ analysis.filename }}</h2>
+            <p><strong>Job Title:</strong> {{ analysis.job_title }}</p>
+            <p><strong>Match Score:</strong> <span class="score">{{ analysis.score }}%</span></p>
+            <p><strong>Summary:</strong> {{ analysis.summary }}</p>
+            <h3>Recommendations:</h3>
+            <ul>
+                {% for rec in analysis.recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        <a href="/" class="btn">Analyze More</a>
+    </div>
+</body>
+</html>
