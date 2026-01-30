@@ -37,7 +37,15 @@ An AI-powered web application that analyzes multiple resumes against a specific 
    pip install -r requirements.txt
    ```
 
-3. Run the application:
+3. Configure the Environment:
+   - Create a `.env` file in the root directory.
+   - Add your Google Gemini API key:
+     ```env
+     GEMINI_API_KEY=your_actual_api_key_here
+     ```
+     > **Note**: You can use `.env.example` as a template.
+
+4. Run the application:
    ```bash
    python app.py
    ```
