@@ -13,6 +13,7 @@ def upload_resume():
         job_title = request.form['job_title']
         experience = request.form['experience']
         certifications = request.form['certifications']
+        project_description = request.form['project_description']
         
         all_analyses = []
         
@@ -29,7 +30,7 @@ def upload_resume():
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
                 
-                analysis = analyze_resume(filepath, job_title, experience, certifications)
+                analysis = analyze_resume(filepath, job_title, experience, certifications, project_description)
                 all_analyses.append(analysis)
         
         return render_template('results.html', analyses=all_analyses)
