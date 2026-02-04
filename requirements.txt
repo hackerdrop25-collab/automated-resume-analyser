@@ -3,3 +3,6 @@ werkzeug==3.0.1
 google-generativeai
 PyPDF2
 python-dotenv
+Flask-SQLAlchemy
+Flask-Login
+Flask-Bcrypt
