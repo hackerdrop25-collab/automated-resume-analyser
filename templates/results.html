@@ -332,7 +332,14 @@
             <div class="content-layout">
                 <div class="main-content">
                     <h3 class="section-title">Professional Summary</h3>
+                    {% if "Configuration Error" in analysis.summary %}
+                    <div
+                        style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                        <p style="color: #f87171; line-height: 1.7; font-weight: 600;">{{ analysis.summary }}</p>
+                    </div>
+                    {% else %}
                     <p style="color: #cbd5e1; line-height: 1.7; margin-bottom: 2rem;">{{ analysis.summary }}</p>
+                    {% endif %}
 
                     <h3 class="section-title">Technical Skills Detected</h3>
                     <div style="margin-bottom: 2rem;">
@@ -382,7 +389,10 @@
                 <div class="sidebar">
                     <div class="chart-container">
                         <h3 class="section-title" style="font-size: 1rem; text-align: center;">Match Analysis</h3>
-                        <canvas id="chart-{{ loop.index }}"></canvas>
+                        <canvas id="chart-{{ loop.index }}" data-technical="{{ analysis.key_metrics.technical_match }}"
+                            data-experience="{{ analysis.key_metrics.experience_match }}"
+                            data-formatting="{{ analysis.key_metrics.formatting_score }}">
+                        </canvas>
                     </div>
 
                     <div class="chart-container" style="margin-top: 1.5rem;">
@@ -398,38 +408,42 @@
         </div>
 
         <script>
-            new Chart(document.getElementById('chart-{{ loop.index }}'), {
-                type: 'radar',
-                data: {
-                    labels: ['Technical', 'Experience', 'Formatting', 'Soft Skills'],
-                    datasets: [{
-                        label: 'Match Score',
-                        data: [
-                            {{ analysis.key_metrics.technical_match }},
-                    {{ analysis.key_metrics.experience_match }},
-                            {{ analysis.key_metrics.formatting_score }},
-                85 /* Soft skills estimated */
-                        ],
-                backgroundColor: 'rgba(0, 210, 255, 0.2)',
-                borderColor: 'rgba(0, 210, 255, 1)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgba(0, 210, 255, 1)'
-                    }]
-                },
-                options: {
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: { display: false },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                        pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } }
+            (function () {
+                const canvas = document.getElementById('chart-{{ loop.index }}');
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Technical', 'Experience', 'Formatting', 'Soft Skills'],
+                        datasets: [{
+                            label: 'Match Score',
+                            data: [
+                                parseFloat(canvas.dataset.technical) || 0,
+                                parseFloat(canvas.dataset.experience) || 0,
+                                parseFloat(canvas.dataset.formatting) || 0,
+                                85 // Soft skills estimated
+                            ],
+                            backgroundColor: 'rgba(0, 210, 255, 0.2)',
+                            borderColor: 'rgba(0, 210, 255, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(0, 210, 255, 1)'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { display: false },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
                     }
-                },
-                plugins: { legend: { display: false } }
-            }
-            });
+                });
+            })();
         </script>
         {% endfor %}
         {% else %}

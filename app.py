@@ -125,6 +125,38 @@ def view_history():
         h.parsed_data = json.loads(h.data_json)
     return render_template('dashboard.html', histories=histories)
 
+@app.route('/reanalyze/<int:history_id>')
+@login_required
+def reanalyze(history_id):
+    history = AnalysisHistory.query.get_or_404(history_id)
+    if history.user_id != current_user.id:
+        flash("Unauthorized", "danger")
+        return redirect(url_for('view_history'))
+    
+    # Try to re-analyze based on existing files in uploads folder
+    parsed_data = json.loads(history.data_json)
+    new_analyses = []
+    
+    # We need the original parameters. For now, we'll use the ones from the history item description or defaults
+    # In a real app, we'd store these params in the DB.
+    job_title = history.job_title
+    
+    for item in parsed_data:
+        filename = item.get('filename')
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(filepath):
+            # Re-run with the same params (mocking the others if unknown)
+            new_analysis = analyze_resume(filepath, job_title, "3", "N/A", "Professional review")
+            new_analyses.append(new_analysis)
+        else:
+            new_analyses.append(item) # Keep old if file missing
+            
+    history.data_json = json.dumps(new_analyses)
+    history.timestamp = datetime.utcnow()
+    db.session.commit()
+    flash("Analysis refreshed successfully!", "success")
+    return redirect(url_for('view_history'))
+
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     with app.app_context():

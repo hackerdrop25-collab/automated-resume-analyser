@@ -141,7 +141,7 @@
                         </td>
                         <td><span class="badge">{{ (h.parsed_data|map(attribute='score')|sum /
                                 h.parsed_data|length)|round|int }}%</span></td>
-                        <td><a href="/" class="btn">Re-run</a></td>
+                        <td><a href="{{ url_for('reanalyze', history_id=h.id) }}" class="btn">Re-run</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -308,6 +308,22 @@
 
         document.getElementById('analysis-form').onsubmit = function () {
             document.getElementById('loading').style.display = 'flex';
+
+            const messages = [
+                "Extracting text from resumes...",
+                "Analyzing technical skills...",
+                "Matching experience requirements...",
+                "Checking certification validity...",
+                "Formatting results for your dashboard...",
+                "Almost there! Finalizing AI insights..."
+            ];
+
+            let i = 0;
+            const textElement = document.querySelector('.progress-text');
+            setInterval(() => {
+                textElement.innerText = messages[i % messages.length];
+                i++;
+            }, 3000);
         };
     </script>
 </body>
