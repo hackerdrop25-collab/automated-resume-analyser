@@ -1,13 +1,15 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 import os
+from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from gemini_ai import analyze_resume
+import json
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-very-secret-key-here' # In production, use env variable
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-dev-key')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 
@@ -21,6 +23,14 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    analyses = db.relationship('AnalysisHistory', backref='author', lazy=True)
+
+class AnalysisHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    job_title = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    data_json = db.Column(db.Text, nullable=False) # Stores stringified list of analysis objects
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -38,7 +48,7 @@ def register():
         db.session.add(user)
         try:
             db.session.commit()
-            flash('Your account has been created! You can now log in.', 'success')
+            flash('Account created! Please log in.', 'success')
             return redirect(url_for('login'))
         except:
             flash('Email already exists.', 'danger')
@@ -56,7 +66,7 @@ def login():
             login_user(user)
             return redirect(url_for('upload_resume'))
         else:
-            flash('Login unsuccessful. Please check email and password.', 'danger')
+            flash('Login unsuccessful. Check email/password.', 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -89,12 +99,31 @@ def upload_resume():
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
                 
+                # Perform analysis
                 analysis = analyze_resume(filepath, job_title, experience, certifications, project_description)
                 all_analyses.append(analysis)
+        
+        # Save to history
+        new_history = AnalysisHistory(
+            job_title=job_title,
+            data_json=json.dumps(all_analyses),
+            author=current_user
+        )
+        db.session.add(new_history)
+        db.session.commit()
         
         return render_template('results.html', analyses=all_analyses)
             
     return render_template('upload.html')
+
+@app.route('/history')
+@login_required
+def view_history():
+    histories = AnalysisHistory.query.filter_by(user_id=current_user.id).order_by(AnalysisHistory.timestamp.desc()).all()
+    # Parse data_json back to list for display
+    for h in histories:
+        h.parsed_data = json.loads(h.data_json)
+    return render_template('dashboard.html', histories=histories)
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

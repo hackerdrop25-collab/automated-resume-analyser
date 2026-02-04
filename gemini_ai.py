@@ -44,27 +44,49 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             'job_title': job_title,
             'summary': "Configuration Error: GEMINI_API_KEY is missing or invalid. Please update your .env file with a valid key.",
             'score': 0,
-            'recommendations': ["Add a valid GEMINI_API_KEY to the .env file.", "Restart the server after adding the key."]
+            'key_metrics': {'technical_match': 0, 'experience_match': 0, 'formatting_score': 0},
+            'skills_analysis': {'matched_technical_skills': [], 'missing_critical_skills': [], 'soft_skills_detected': []},
+            'strengths': [],
+            'weaknesses': [],
+            'recommendations': ["Add a valid GEMINI_API_KEY to the .env file."],
+            'interview_questions': []
         }
     
     # Re-configure if key was added after startup
     genai.configure(api_key=current_api_key)
 
-    resume_text = extract_text_from_pdf(filepath)
-    
+    # Handle PDF or DOCX
+    resume_text = ""
+    if filepath.lower().endswith('.pdf'):
+        resume_text = extract_text_from_pdf(filepath)
+    elif filepath.lower().endswith('.docx'):
+        try:
+            from docx import Document
+            doc = Document(filepath)
+            resume_text = "\n".join([para.text for para in doc.paragraphs])
+        except Exception as e:
+            print(f"Error extracting DOCX: {e}")
+            
     if not resume_text:
         return {
             'filename': filename,
             'job_title': job_title,
             'summary': "Error: Could not extract text from this resume.",
             'score': 0,
-            'recommendations': ["Ensure the file is a valid PDF and contains readable text."]
+            'key_metrics': {'technical_match': 0, 'experience_match': 0, 'formatting_score': 0},
+            'skills_analysis': {'matched_technical_skills': [], 'missing_critical_skills': [], 'soft_skills_detected': []},
+            'strengths': [],
+            'weaknesses': [],
+            'recommendations': ["Ensure the file is a valid PDF or DOCX."],
+            'interview_questions': []
         }
 
     prompt = f"""
-    You are a Senior Technical Recruiter and Career Coach with 15+ years of experience.
-    Your task is to perform a deep-dive analysis of the following resume against the specific job requirements.
+    You are a Senior Technical Recruiter with 20+ years of experience.
+    Perform a rigorous analysis of this resume against the job requirements.
     
+    CRITICAL FOCUS: You must calculate an "Experience Match" based on the required {experience} years vs. what's in the resume.
+
     Job Profile:
     - Role: {job_title}
     - Required Experience: {experience} years
@@ -74,32 +96,26 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     Resume Content:
     {resume_text}
     
-    Analyze the resume for:
-    1. Technical Skills Match (What is present vs. missing)
-    2. Soft Skills & Leadership qualities.
-    3. Experience Relevance & Depth.
-    4. Formatting, Clarity, and ATS Optimization.
-    5. Cultural Fit indicators.
-
-    Provide the output in the following STRICT JSON format containing ONLY the JSON object. Do not add markdown backticks or any other text.
+    Provide the output in STRICT JSON format:
     {{
         "filename": "{filename}",
         "job_title": "{job_title}",
-        "summary": "A professional executive summary of the candidate's fit (3-4 sentences).",
-        "score": (0-100 integer),
+        "summary": "3-4 sentence professional summary of fit.",
+        "score": (0-100 overall score),
         "key_metrics": {{
-            "technical_match": (0-100 integer),
-            "experience_rating": (0-100 integer),
-            "formatting_score": (0-100 integer)
+            "technical_match": (0-100),
+            "experience_match": (0-100),
+            "formatting_score": (0-100)
         }},
         "skills_analysis": {{
-            "matched_technical_skills": ["skill1", "skill2", ...],
-            "missing_critical_skills": ["missing1", "missing2", ...],
-            "soft_skills_detected": ["soft1", "soft2", ...]
+            "matched_technical_skills": ["list", "of", "skills"],
+            "missing_critical_skills": ["list", "of", "missing"],
+            "soft_skills_detected": ["list", "of", "soft", "skills"]
         }},
-        "strengths": ["Strong point 1", "Strong point 2", ...],
-        "weaknesses": ["Weak area 1", "Weak area 2", ...],
-        "recommendations": ["Actionable advice 1", "Actionable advice 2", ...]
+        "strengths": ["point 1", "point 2"],
+        "weaknesses": ["area 1", "area 2"],
+        "recommendations": ["advice 1", "advice 2"],
+        "interview_questions": ["question 1", "question 2", "question 3"]
     }}
     """
 
@@ -107,27 +123,26 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         
-        # Clean the response to ensure it's valid JSON
         result_text = response.text.strip()
-        if result_text.startswith("```json"):
-            result_text = result_text[7:].strip()
+        # Remove any markdown code blocks
         if result_text.startswith("```"):
-             result_text = result_text[3:].strip()
-        if result_text.endswith("```"):
-            result_text = result_text[:-3].strip()
-            
+            result_text = result_text.split("```")[1]
+            if result_text.startswith("json"):
+                result_text = result_text[4:].strip()
+        
         result = json.loads(result_text)
         return result
     except Exception as e:
         print(f"Error calling Gemini: {e}")
-        return {
+        return {{
             'filename': filename,
             'job_title': job_title,
             'summary': f"Error during AI analysis: {str(e)}",
             'score': 0,
-            'key_metrics': {'technical_match': 0, 'experience_rating': 0, 'formatting_score': 0},
+            'key_metrics': {'technical_match': 0, 'experience_match': 0, 'formatting_score': 0},
             'skills_analysis': {'matched_technical_skills': [], 'missing_critical_skills': [], 'soft_skills_detected': []},
             'strengths': [],
             'weaknesses': [],
-            'recommendations': ["Try again in a few moments.", "Check your API key configuration."]
-        }
+            'recommendations': ["Check API key and try again."],
+            'interview_questions': []
+        }}

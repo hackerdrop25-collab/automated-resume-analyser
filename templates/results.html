@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Results - Resume Analysis Pro</title>
+    <title>Advanced Analysis - Resume Analysis Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #00d2ff;
@@ -14,6 +15,9 @@
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
             --text: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         * {
@@ -26,12 +30,9 @@
         body {
             background-color: var(--bg-dark);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             color: var(--text);
             padding: 2rem;
             position: relative;
-            overflow-x: hidden;
         }
 
         .animated-bg {
@@ -86,42 +87,9 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .user-info {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: color 0.2s;
-        }
-
-        .nav-link:hover {
-            color: var(--primary);
-        }
-
-        .logout-btn {
-            padding: 0.5rem 1rem;
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-        }
-
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            width: 100%;
         }
 
         .result-card {
@@ -137,7 +105,7 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
 
             to {
@@ -146,94 +114,169 @@
             }
         }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
         .resume-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--glass-border);
         }
 
-        .score-badge {
-            padding: 0.5rem 1.5rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            border-radius: 50px;
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #0f172a;
-            font-weight: 700;
-            font-size: 1.25rem;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
         }
 
-        h2 {
+        .score-val {
             font-size: 1.75rem;
-            color: #fff;
+            font-weight: 700;
         }
 
-        h3 {
-            font-size: 1.25rem;
-            color: var(--primary);
-            margin: 1.5rem 0 0.75rem;
+        .score-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .analysis-section {
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
             background: rgba(15, 23, 42, 0.4);
             padding: 1.5rem;
             border-radius: 16px;
             border: 1px solid var(--glass-border);
+            text-align: center;
         }
 
-        ul {
-            list-style-type: none;
-            padding-left: 0;
+        .metric-title {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
         }
 
-        li {
-            padding: 0.5rem 0;
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            color: var(--primary);
+        }
+
+        .skill-tag.missing {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: 0.75rem 0;
             padding-left: 1.5rem;
             position: relative;
             color: #cbd5e1;
-            line-height: 1.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        li::before {
-            content: "•";
-            color: var(--primary);
+        .info-list li::before {
+            content: "→";
             position: absolute;
             left: 0;
-            font-weight: bold;
+            color: var(--primary);
         }
 
-        .no-results {
-            text-align: center;
-            padding: 5rem;
-            color: #94a3b8;
-        }
-
-        .btn-back {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 0.75rem 2rem;
-            background: var(--glass);
+        .chart-container {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 1.5rem;
+            border-radius: 20px;
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: #fff;
-            text-decoration: none;
-            transition: all 0.2s;
         }
 
-        .btn-back:hover {
-            background: var(--glass-border);
-            transform: translateX(-5px);
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: #0f172a;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: white;
+            margin-top: 2rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -246,62 +289,159 @@
 
     <nav>
         <div class="logo">Resume Analysis Pro</div>
-        <div class="user-info">
-            <a href="/" class="nav-link">New Analysis</a>
-            <span style="color: #64748b;">|</span>
-            <span>{{ current_user.email if current_user.is_authenticated else 'Guest' }}</span>
-            <a href="/logout" class="logout-btn">Logout</a>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <a href="/" style="color: #cbd5e1; text-decoration: none;">New Analysis</a>
+            <a href="/logout"
+                style="color: #f87171; text-decoration: none; padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">Logout</a>
         </div>
     </nav>
 
     <div class="container">
-        <h1>Analysis Reports</h1>
+        <h1 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem;">AI Analysis Reports</h1>
 
         {% if analyses %}
         {% for analysis in analyses %}
         <div class="result-card">
             <div class="resume-header">
-                <h2>{{ analysis.name }}</h2>
-                <div class="score-badge">{{ analysis.JD_Match }} Match</div>
+                <div>
+                    <h2 style="font-size: 1.5rem; color: white;">{{ analysis.filename }}</h2>
+                    <p style="color: #94a3b8; margin-top: 0.5rem;">Role: {{ analysis.job_title }}</p>
+                </div>
+                <div class="score-circle">
+                    <span class="score-val">{{ analysis.score }}%</span>
+                    <span class="score-label">Match</span>
+                </div>
             </div>
 
-            <div class="analysis-section">
-                <h3>Professional Summary</h3>
-                <p style="color: #cbd5e1; line-height: 1.6;">{{ analysis.Summary }}</p>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Technical Match</div>
+                    <div class="metric-value">{{ analysis.key_metrics.technical_match }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Experience Fit</div>
+                    <div class="metric-value text-success" style="color: #10b981;">{{
+                        analysis.key_metrics.experience_match }}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">ATS Optimization</div>
+                    <div class="metric-value">{{ analysis.key_metrics.formatting_score }}%</div>
+                </div>
+            </div>
 
-                <h3>Strengths</h3>
-                <ul>
-                    {% if analysis.Strengths is string %}
-                    <li>{{ analysis.Strengths }}</li>
-                    {% else %}
-                    {% for strength in analysis.Strengths %}
-                    <li>{{ strength }}</li>
-                    {% endfor %}
-                    {% endif %}
-                </ul>
+            <div class="content-layout">
+                <div class="main-content">
+                    <h3 class="section-title">Professional Summary</h3>
+                    <p style="color: #cbd5e1; line-height: 1.7; margin-bottom: 2rem;">{{ analysis.summary }}</p>
 
-                <h3>Areas for Improvement</h3>
-                <ul>
-                    {% if analysis.Weaknesses is string %}
-                    <li>{{ analysis.Weaknesses }}</li>
-                    {% else %}
-                    {% for weakness in analysis.Weaknesses %}
-                    <li>{{ weakness }}</li>
-                    {% endfor %}
+                    <h3 class="section-title">Technical Skills Detected</h3>
+                    <div style="margin-bottom: 2rem;">
+                        {% for skill in analysis.skills_analysis.matched_technical_skills %}
+                        <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+
+                    {% if analysis.skills_analysis.missing_critical_skills %}
+                    <h3 class="section-title" style="color: #f87171;">Missing Critical Skills</h3>
+                    <div style="margin-bottom: 2rem;">
+                        {% for skill in analysis.skills_analysis.missing_critical_skills %}
+                        <span class="skill-tag missing">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
                     {% endif %}
-                </ul>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h3 class="section-title">Top Strengths</h3>
+                            <ul class="info-list">
+                                {% for strength in analysis.strengths %}
+                                <li>{{ strength }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="section-title">Areas to Improve</h3>
+                            <ul class="info-list">
+                                {% for weakness in analysis.weaknesses %}
+                                <li>{{ weakness }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {% if analysis.interview_questions %}
+                    <h3 class="section-title" style="margin-top: 2rem;">Suggested Interview Questions</h3>
+                    <ul class="info-list">
+                        {% for q in analysis.interview_questions %}
+                        <li>{{ q }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+
+                <div class="sidebar">
+                    <div class="chart-container">
+                        <h3 class="section-title" style="font-size: 1rem; text-align: center;">Match Analysis</h3>
+                        <canvas id="chart-{{ loop.index }}"></canvas>
+                    </div>
+
+                    <div class="chart-container" style="margin-top: 1.5rem;">
+                        <h3 class="section-title" style="font-size: 1rem;">Actionable Advice</h3>
+                        <ul class="info-list" style="font-size: 0.875rem;">
+                            {% for rec in analysis.recommendations %}
+                            <li>{{ rec }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <script>
+            new Chart(document.getElementById('chart-{{ loop.index }}'), {
+                type: 'radar',
+                data: {
+                    labels: ['Technical', 'Experience', 'Formatting', 'Soft Skills'],
+                    datasets: [{
+                        label: 'Match Score',
+                        data: [
+                            {{ analysis.key_metrics.technical_match }},
+                    {{ analysis.key_metrics.experience_match }},
+                            {{ analysis.key_metrics.formatting_score }},
+                85 /* Soft skills estimated */
+                        ],
+                backgroundColor: 'rgba(0, 210, 255, 0.2)',
+                borderColor: 'rgba(0, 210, 255, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(0, 210, 255, 1)'
+                    }]
+                },
+                options: {
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { display: false },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+            });
+        </script>
         {% endfor %}
         {% else %}
-        <div class="result-card no-results">
-            <p>No analysis results available. Please upload resumes first.</p>
-            <a href="/" class="btn-back">Return to Dashboard</a>
+        <div class="result-card" style="text-align: center; padding: 5rem;">
+            <h2 style="color: #94a3b8; margin-bottom: 1.5rem;">No Analysis Data Found</h2>
+            <p>Please upload resumes and job description to get started.</p>
+            <a href="/" class="btn btn-outline">Go to Dashboard</a>
         </div>
         {% endif %}
 
-        <div style="text-align: center; margin-bottom: 4rem;">
-            <a href="/" class="btn-back">Analyze More Resumes</a>
+        <div style="text-align: center; padding-bottom: 4rem;">
+            <a href="/" class="btn btn-primary">Analyze More Resumes</a>
         </div>
     </div>
 </body>
