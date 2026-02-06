@@ -9,12 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #00d2ff;
-            --secondary: #3a7bd5;
-            --bg-dark: #0f172a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg-dark: #020617;
+            --glass: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text: #f1f5f9;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -31,39 +31,89 @@
             background-color: var(--bg-dark);
             min-height: 100vh;
             color: var(--text);
-            padding: 2rem;
+            padding: 1.5rem;
             position: relative;
+            overflow-x: hidden;
         }
 
-        .animated-bg {
+        /* Premium Animated Background */
+        .background-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            background: radial-gradient(circle at top right, #1e293b, #020617, #020617);
+            overflow: hidden;
         }
 
-        .blob {
+        .star {
             position: absolute;
-            width: 600px;
-            height: 600px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            filter: blur(100px);
+            background: white;
             border-radius: 50%;
-            opacity: 0.1;
-            z-index: -1;
+            opacity: 0.3;
+            animation: twinkle var(--duration) infinite ease-in-out;
         }
 
-        .blob-1 {
-            top: -200px;
-            left: -200px;
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.2);
+            }
         }
 
-        .blob-2 {
-            bottom: -200px;
-            right: -200px;
+        .gradient-sphere {
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(-10%, -10%);
+            }
+
+            100% {
+                transform: translate(10%, 10%);
+            }
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         nav {
@@ -282,18 +332,29 @@
 </head>
 
 <body>
-    <div class="animated-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
+    <div class="background-wrapper" id="stars-container">
+        <div class="gradient-sphere" style="top: -10%; left: -10%;"></div>
+        <div class="gradient-sphere" style="bottom: -10%; right: -10%; animation-delay: -5s;"></div>
     </div>
 
+    <script>
+        const container = document.getElementById('stars-container');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            container.appendChild(star);
+        }
+    </script>
+
     <nav>
-        <div class="logo">Resume Analysis Pro</div>
-        <div style="display: flex; align-items: center; gap: 1.5rem;">
-            <a href="/" style="color: #cbd5e1; text-decoration: none;">New Analysis</a>
-            <a href="/logout"
-                style="color: #f87171; text-decoration: none; padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">Logout</a>
-        </div>
+        <div class="logo">RESUME ANALYZER AI</div>
     </nav>
 
     <div class="container">
@@ -332,14 +393,7 @@
             <div class="content-layout">
                 <div class="main-content">
                     <h3 class="section-title">Professional Summary</h3>
-                    {% if "Configuration Error" in analysis.summary %}
-                    <div
-                        style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
-                        <p style="color: #f87171; line-height: 1.7; font-weight: 600;">{{ analysis.summary }}</p>
-                    </div>
-                    {% else %}
                     <p style="color: #cbd5e1; line-height: 1.7; margin-bottom: 2rem;">{{ analysis.summary }}</p>
-                    {% endif %}
 
                     <h3 class="section-title">Technical Skills Detected</h3>
                     <div style="margin-bottom: 2rem;">

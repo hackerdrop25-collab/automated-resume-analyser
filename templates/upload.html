@@ -226,106 +226,283 @@
         </div>
     </nav>
 
-    <div class="container">
-        <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">Real-Time AI Analysis</h1>
+    .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--glass);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    padding: 3.5rem;
+    border-radius: 32px;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+    position: relative;
+    z-index: 10;
+    }
 
-        <form action="/" method="POST" enctype="multipart/form-data" id="analysis-form">
-            <div style="display: grid; grid-template-columns: 1fr 150px; gap: 1.5rem;">
+    h1 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(to bottom, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    }
+
+    .form-group {
+    margin-bottom: 2rem;
+    }
+
+    label {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+    width: 100%;
+    padding: 1.125rem 1.5rem;
+    background: rgba(2, 6, 23, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(2, 6, 23, 0.8);
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.1);
+    }
+
+    .drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .drop-zone:hover {
+    border-color: var(--primary);
+    background: rgba(0, 242, 254, 0.03);
+    transform: scale(1.02);
+    }
+
+    .btn-submit {
+    width: 100%;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 18px;
+    color: #020617;
+    font-weight: 700;
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 242, 254, 0.3);
+    }
+
+    .btn-submit:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px -15px rgba(0, 242, 254, 0.5);
+    filter: brightness(1.1);
+    }
+
+    .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(2, 6, 23, 0.95);
+    backdrop-filter: blur(20px);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    }
+
+    .spinner {
+    width: 80px;
+    height: 80px;
+    border: 4px solid rgba(0, 242, 254, 0.1);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    .progress-text {
+    margin-top: 2.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    }
+    </style>
+    </head>
+
+    <body>
+        <div class="background-wrapper" id="stars-container">
+            <div class="gradient-sphere" style="top: -10%; left: -10%;"></div>
+            <div class="gradient-sphere" style="bottom: -10%; right: -10%; animation-delay: -5s;"></div>
+        </div>
+
+        <script>
+            const container = document.getElementById('stars-container');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(star);
+            }
+        </script>
+
+        <div id="loading" class="loading-overlay">
+            <div class="spinner"></div>
+            <div class="progress-text">Neural engines analyzing...</div>
+            <p style="color: #64748b; margin-top: 1rem; font-weight: 500;">Synthesizing resume insights</p>
+        </div>
+
+        <nav>
+            <div class="logo">RESUME ANALYZER AI</div>
+        </nav>
+
+        <div class="container">
+            <h1>Intelligent Analysis</h1>
+
+            <form action="/" method="POST" enctype="multipart/form-data" id="analysis-form">
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 2rem;">
+                    <div class="form-group">
+                        <label>Target Role</label>
+                        <input type="text" name="job_title" placeholder="e.g. Senior Software Engineer" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Min Years Exp</label>
+                        <input type="number" name="experience" placeholder="e.g. 5" required>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label>Target Job Title</label>
-                    <input type="text" name="job_title" placeholder="e.g. Full Stack Developer" required>
+                    <label>Desired Certifications</label>
+                    <input type="text" name="certifications" placeholder="e.g. AWS Solutions Architect, PMP">
                 </div>
+
                 <div class="form-group">
-                    <label>Min Experience</label>
-                    <input type="number" name="experience" placeholder="e.g. 3" required>
+                    <label>Requirement Context</label>
+                    <textarea name="project_description" rows="5"
+                        placeholder="Describe specific tech stack, project goals, or leadership needs..."></textarea>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label>Key Certifications (Optional)</label>
-                <input type="text" name="certifications" placeholder="e.g. AWS, Azure, Google Cloud">
-            </div>
-
-            <div class="form-group">
-                <label>Detailed Project Requirements</label>
-                <textarea name="project_description" rows="4"
-                    placeholder="Paste key responsibilities and technical requirements..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Number of Resumes (1-10)</label>
-                <input type="number" id="num_resumes" name="num_resumes" min="1" max="10" value="1"
-                    onchange="generateInputs()">
-            </div>
-
-            <div id="file-inputs" style="margin-top: 1rem;">
-                <!-- Inputs generated here -->
-                <div class="drop-zone" onclick="document.getElementById('file-1').click()">
-                    <p style="color: #94a3b8;">Click or Drag Resume 1 (PDF/DOCX)</p>
-                    <input type="file" id="file-1" name="resume_1" accept=".pdf,.docx" style="display: none;" required
-                        onchange="updateLabel(1)">
-                    <p id="label-1"
-                        style="color: var(--primary); margin-top: 0.5rem; font-weight: 600; font-size: 0.85rem;"></p>
+                <div class="form-group">
+                    <label>Batch Size (1-10 Resumes)</label>
+                    <input type="number" id="num_resumes" name="num_resumes" min="1" max="10" value="1"
+                        onchange="generateInputs()" style="border-style: solid;">
                 </div>
-            </div>
 
-            <button type="submit" class="btn-submit">
-                <span>Start Advanced Analysis</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
-        </form>
-    </div>
+                <div id="file-inputs" style="margin-top: 1.5rem;">
+                    <!-- Inputs generated here -->
+                    <div class="drop-zone" onclick="document.getElementById('file-1').click()">
+                        <p style="color: #64748b; font-weight: 500;">Click or Drag Resume 1 (PDF/DOCX)</p>
+                        <input type="file" id="file-1" name="resume_1" accept=".pdf,.docx" style="display: none;"
+                            required onchange="updateLabel(1)">
+                        <p id="label-1"
+                            style="color: var(--primary); margin-top: 0.75rem; font-weight: 700; font-size: 0.875rem;">
+                        </p>
+                    </div>
+                </div>
 
-    <script>
-        function generateInputs() {
-            const num = document.getElementById('num_resumes').value;
-            const container = document.getElementById('file-inputs');
-            container.innerHTML = '';
-            for (let i = 1; i <= num; i++) {
-                const zone = document.createElement('div');
-                zone.className = 'drop-zone';
-                zone.onclick = () => document.getElementById(`file-${i}`).click();
-                zone.innerHTML = `
+                <button type="submit" class="btn-submit">
+                    <span>Start AI Analysis</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <script>
+            function generateInputs() {
+                const num = document.getElementById('num_resumes').value;
+                const container = document.getElementById('file-inputs');
+                container.innerHTML = '';
+                for (let i = 1; i <= num; i++) {
+                    const zone = document.createElement('div');
+                    zone.className = 'drop-zone';
+                    zone.onclick = () => document.getElementById(`file-${i}`).click();
+                    zone.innerHTML = `
                     <p style="color: #94a3b8;">Click or Drag Resume ${i} (PDF/DOCX)</p>
                     <input type="file" id="file-${i}" name="resume_${i}" accept=".pdf,.docx" style="display: none;" required onchange="updateLabel(${i})">
                     <p id="label-${i}" style="color: var(--primary); margin-top: 0.5rem; font-weight: 600; font-size: 0.85rem;"></p>
                 `;
-                container.appendChild(zone);
+                    container.appendChild(zone);
+                }
             }
-        }
 
-        function updateLabel(id) {
-            const input = document.getElementById(`file-${id}`);
-            const label = document.getElementById(`label-${id}`);
-            if (input.files && input.files[0]) {
-                label.innerText = "Selected: " + input.files[0].name;
+            function updateLabel(id) {
+                const input = document.getElementById(`file-${id}`);
+                const label = document.getElementById(`label-${id}`);
+                if (input.files && input.files[0]) {
+                    label.innerText = "Selected: " + input.files[0].name;
+                }
             }
-        }
 
-        document.getElementById('analysis-form').onsubmit = function () {
-            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('analysis-form').onsubmit = function () {
+                document.getElementById('loading').style.display = 'flex';
 
-            const messages = [
-                "Extracting text from resumes...",
-                "Analyzing technical skills...",
-                "Matching experience requirements...",
-                "Checking certification validity...",
-                "Formatting results for your dashboard...",
-                "Almost there! Finalizing AI insights..."
-            ];
+                const messages = [
+                    "Extracting text from resumes...",
+                    "Analyzing technical skills...",
+                    "Matching experience requirements...",
+                    "Checking certification validity...",
+                    "Formatting results for your dashboard...",
+                    "Almost there! Finalizing AI insights..."
+                ];
 
-            let i = 0;
-            const textElement = document.querySelector('.progress-text');
-            setInterval(() => {
-                textElement.innerText = messages[i % messages.length];
-                i++;
-            }, 3000);
-        };
-    </script>
-</body>
+                let i = 0;
+                const textElement = document.querySelector('.progress-text');
+                setInterval(() => {
+                    textElement.innerText = messages[i % messages.length];
+                    i++;
+                }, 3000);
+            };
+        </script>
+    </body>
 
 </html>
