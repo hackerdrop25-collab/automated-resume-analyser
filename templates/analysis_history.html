@@ -50,8 +50,10 @@
         h1 {
             font-size: 2rem;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent;
         }
 
         .nav-links {
@@ -80,6 +82,14 @@
             gap: 1.5rem;
         }
 
+        .analysis-grid a {
+            text-decoration: none;
+            color: inherit;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
         .analysis-card {
             background: var(--glass);
             backdrop-filter: blur(10px);
@@ -106,8 +116,10 @@
             font-size: 2.5rem;
             font-weight: 600;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent;
             margin: 0.5rem 0;
         }
 
@@ -197,21 +209,23 @@
         {% if analyses.items %}
         <div class="analysis-grid">
             {% for analysis in analyses.items %}
-            <div class="analysis-card" onclick="window.location.href='{{ url_for('view_analysis', analysis_id=analysis.id) }}'">
-                <div class="resume-filename">{{ analysis.resume.original_filename }}</div>
-                <div class="score-display">{{ "%.1f"|format(analysis.overall_score) }}%</div>
-                <div class="score-bar">
-                    <div class="score-fill" style="width: {{ analysis.overall_score }}%"></div>
+            <a href="{{ url_for('view_analysis', analysis_id=analysis.id) }}" style="text-decoration: none; color: inherit;">
+                <div class="analysis-card">
+                    <div class="resume-filename">{{ analysis.resume.original_filename }}</div>
+                    <div class="score-display">{{ "%.1f"|format(analysis.overall_score) }}%</div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: {{ analysis.overall_score }}%"></div>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #cbd5e1; margin: 0.5rem 0;">
+                        Technical: {{ "%.0f"|format(analysis.technical_score) }}%
+                        | Experience: {{ "%.0f"|format(analysis.experience_score) }}%
+                        | Format: {{ "%.0f"|format(analysis.formatting_score) }}%
+                    </div>
+                    <div class="analysis-date">
+                        📅 {{ analysis.analyzed_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
                 </div>
-                <div style="font-size: 0.9rem; color: #cbd5e1; margin: 0.5rem 0;">
-                    Technical: {{ "%.0f"|format(analysis.technical_score) }}%
-                    | Experience: {{ "%.0f"|format(analysis.experience_score) }}%
-                    | Format: {{ "%.0f"|format(analysis.formatting_score) }}%
-                </div>
-                <div class="analysis-date">
-                    📅 {{ analysis.analyzed_at.strftime('%B %d, %Y at %I:%M %p') }}
-                </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
 

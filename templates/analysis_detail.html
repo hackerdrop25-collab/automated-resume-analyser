@@ -1,196 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analysis Details - Resume Analyzer</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #00d2ff;
-            --secondary: #3a7bd5;
-            --bg-dark: #0f172a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
-            min-height: 100vh;
-            color: var(--text);
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        a {
-            padding: 0.5rem 1rem;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            color: var(--text);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        a:hover {
-            background: rgba(0, 210, 255, 0.1);
-            border-color: var(--primary);
-        }
-
-        h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .score-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .score-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .score-label {
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            margin-bottom: 0.5rem;
-        }
-
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .score-bar {
-            height: 8px;
-            background: var(--glass-border);
-            border-radius: 4px;
-            margin: 0.5rem 0;
-            overflow: hidden;
-        }
-
-        .score-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-
-        .detail-section {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        h3 {
-            font-size: 1rem;
-            margin: 0.5rem 0;
-            color: #cbd5e1;
-        }
-
-        .item-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .item-list li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: #e2e8f0;
-        }
-
-        .item-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--success);
-            font-weight: bold;
-        }
-
-        .weakness-list li:before {
-            content: "⚠";
-            color: var(--warning);
-        }
-
-        .recommendation-list li:before {
-            content: "→";
-            color: var(--primary);
-        }
-
-        .summary {
-            color: #e2e8f0;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .meta-info {
-            display: flex;
-            gap: 2rem;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .meta-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .meta-label {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-        }
+        :root { --primary: #00d2ff; --secondary: #3a7bd5; --bg-dark: #0f172a; --glass: rgba(255,255,255,0.05); --glass-border: rgba(255,255,255,0.1); --text: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%); min-height: 100vh; color: var(--text); padding: 2rem; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        h1 { font-size: 2rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        a { padding: 0.5rem 1rem; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); text-decoration: none; transition: all 0.3s ease; }
+        a:hover { background: rgba(0, 210, 255, 0.1); border-color: var(--primary); }
+        .score-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .score-card { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; text-align: center; }
+        .score-label { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 0.5rem; }
+        .score-value { font-size: 2.5rem; font-weight: 600; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .score-bar { height: 8px; background: var(--glass-border); border-radius: 4px; margin: 0.5rem 0; overflow: hidden; }
+        .score-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .detail-section { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--primary); }
+        h3 { font-size: 1rem; margin: 0.5rem 0; color: #cbd5e1; }
+        .item-list { list-style: none; padding: 0; }
+        .item-list li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #e2e8f0; }
+        .item-list li:before { content: "✓"; position: absolute; left: 0; color: #10b981; font-weight: bold; }
+        .weakness-list li:before { content: "⚠"; color: #f59e0b; }
+        .recommendation-list li:before { content: "→"; color: var(--primary); }
+        .summary { color: #e2e8f0; line-height: 1.6; margin-bottom: 1rem; }
+        .meta-info { display: flex; gap: 2rem; font-size: 0.9rem; color: #cbd5e1; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); }
+        .meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .meta-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
