@@ -124,27 +124,51 @@ def upload_resume():
                     # Perform analysis
                     analysis = analyze_resume(filepath, job_title, experience, certifications, project_description)
                     
+                    # Normalize analysis data for storage and template
+                    # Gemini returns keys like 'score', 'key_metrics', etc.
+                    metrics = analysis.get('key_metrics', {})
+                    skills_analysis = analysis.get('skills_analysis', {})
+                    
+                    overall_score = analysis.get('score', 0)
+                    tech_score = metrics.get('technical_match', 0)
+                    exp_score = metrics.get('experience_match', 0)
+                    fmt_score = metrics.get('formatting_score', 0)
+                    
                     # Store analysis result in database
                     analysis_result = AnalysisResult(
                         user_id=current_user.id,
                         resume_id=resume.id,
-                        technical_score=analysis.get('technical_score'),
-                        experience_score=analysis.get('experience_score'),
-                        formatting_score=analysis.get('formatting_score'),
-                        overall_score=analysis.get('overall_score'),
+                        technical_score=tech_score,
+                        experience_score=exp_score,
+                        formatting_score=fmt_score,
+                        overall_score=overall_score,
                         summary=analysis.get('summary'),
                         strengths=json.dumps(analysis.get('strengths', [])),
                         weaknesses=json.dumps(analysis.get('weaknesses', [])),
                         recommendations=json.dumps(analysis.get('recommendations', [])),
-                        matched_skills=json.dumps(analysis.get('matched_skills', [])),
-                        missing_skills=json.dumps(analysis.get('missing_skills', []))
+                        matched_skills=json.dumps(skills_analysis.get('matched_technical_skills', [])),
+                        missing_skills=json.dumps(skills_analysis.get('missing_critical_skills', []))
                     )
                     db.session.add(analysis_result)
                     
+                    # Store processed data for the immediate response
+                    processed_analysis = {
+                        'overall_score': overall_score,
+                        'technical_score': tech_score,
+                        'experience_score': exp_score,
+                        'formatting_score': fmt_score,
+                        'summary': analysis.get('summary'),
+                        'strengths': analysis.get('strengths', []),
+                        'weaknesses': analysis.get('weaknesses', []),
+                        'recommendations': analysis.get('recommendations', []),
+                        'matched_skills': skills_analysis.get('matched_technical_skills', []),
+                        'missing_skills': skills_analysis.get('missing_critical_skills', [])
+                    }
+                    
                     all_analyses.append({
-                        'analysis': analysis,
+                        'analysis': processed_analysis,
                         'resume_filename': original_filename,
-                        'analysis_id': None  # Will be set after commit
+                        'analysis_id': None
                     })
                     resume_ids.append(resume.id)
                     
@@ -177,13 +201,91 @@ def upload_resume():
     return render_template('upload.html')
 
 
-# job_description route removed - focus on upload only
+@app.route('/results/latest')
+@login_required
+def view_latest_results():
+    """View the most recent analysis results"""
+    # Get all analysis results for current user, ordered by most recent
+    results = AnalysisResult.query.filter_by(user_id=current_user.id).order_by(AnalysisResult.analyzed_at.desc()).all()
+    
+    if not results:
+        flash('No analysis results found. Please upload and analyze resumes first.', 'info')
+        return redirect(url_for('upload_resume'))
+    
+    # Group results by analysis session (same analyzed_at timestamp within 1 minute)
+    from datetime import timedelta
+    sessions = []
+    current_session = []
+    last_time = None
+    
+    for result in results:
+        if last_time is None or abs((result.analyzed_at - last_time).total_seconds()) < 60:
+            current_session.append(result)
+            last_time = result.analyzed_at
+        else:
+            if current_session:
+                sessions.append(current_session)
+            current_session = [result]
+            last_time = result.analyzed_at
+    
+    if current_session:
+        sessions.append(current_session)
+    
+    # Use the most recent session
+    latest_session = sessions[0] if sessions else []
+    
+    # Format data for template
+    all_analyses = []
+    for result in latest_session:
+        analysis_data = {
+            'overall_score': result.overall_score or 0,
+            'technical_score': result.technical_score or 0,
+            'experience_score': result.experience_score or 0,
+            'formatting_score': result.formatting_score or 0,
+            'summary': result.summary,
+            'strengths': result.get_strengths(),
+            'weaknesses': result.get_weaknesses(),
+            'recommendations': result.get_recommendations(),
+            'matched_skills': result.get_matched_skills(),
+            'missing_skills': result.get_missing_skills()
+        }
+        
+        all_analyses.append({
+            'analysis': analysis_data,
+            'resume_filename': result.resume.original_filename,
+            'analysis_id': result.id
+        })
+    
+    return render_template('matching.html', analyses=all_analyses)
 
 
-# analysis_history route removed - focus on upload only
-
-
-# analysis detail route removed - focus on upload only
+@app.route('/results/<int:resume_id>')
+@login_required
+def view_specific_result(resume_id):
+    """View analysis result for a specific resume"""
+    result = AnalysisResult.query.filter_by(resume_id=resume_id, user_id=current_user.id).first_or_404()
+    
+    # Format data for template
+    analysis_data = {
+        'overall_score': result.overall_score or 0,
+        'technical_score': result.technical_score or 0,
+        'experience_score': result.experience_score or 0,
+        'formatting_score': result.formatting_score or 0,
+        'summary': result.summary,
+        'strengths': result.get_strengths(),
+        'weaknesses': result.get_weaknesses(),
+        'recommendations': result.get_recommendations(),
+        'matched_skills': result.get_matched_skills(),
+        'missing_skills': result.get_missing_skills()
+    }
+    
+    all_analyses = [{
+        'analysis': analysis_data,
+        'resume_filename': result.resume.original_filename,
+        'analysis_id': result.id
+    }]
+    
+    return render_template('matching.html', analyses=all_analyses)
 
 
 @app.route('/api/analysis/<int:analysis_id>')
