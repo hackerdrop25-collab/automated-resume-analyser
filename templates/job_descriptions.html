@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Job Descriptions - Resume Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --bg-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        a {
+            padding: 0.5rem 1rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .form-section {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 210, 255, 0.3);
+        }
+
+        .job-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .job-card:hover {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .job-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .job-description {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .job-meta {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #cbd5e1;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💼 Manage Job Descriptions</h1>
+            <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+        </div>
+
+        <div class="form-section">
+            <h2>Add New Job Description</h2>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="job_title">Job Title *</label>
+                    <input type="text" id="job_title" name="job_title" required placeholder="e.g., Senior Python Developer">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Job Description</label>
+                    <textarea id="description" name="description" placeholder="Full job description (optional)"></textarea>
+                    <div class="help-text">Paste the job posting details here</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience">Required Experience</label>
+                    <input type="text" id="experience" name="experience" placeholder="e.g., 5+ years in Python development">
+                </div>
+
+                <div class="form-group">
+                    <label for="certifications">Required Certifications</label>
+                    <input type="text" id="certifications" name="certifications" placeholder="e.g., AWS Certified, PMP, Google Cloud (comma-separated)">
+                    <div class="help-text">Separate multiple certifications with commas</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="skills">Required Skills</label>
+                    <input type="text" id="skills" name="skills" placeholder="e.g., Python, Django, PostgreSQL, Docker (comma-separated)" required>
+                    <div class="help-text">Separate multiple skills with commas</div>
+                </div>
+
+                <button type="submit">➕ Save Job Description</button>
+            </form>
+        </div>
+
+        {% if job_descriptions %}
+        <h2>Saved Job Descriptions</h2>
+        <div class="job-list">
+            {% for job in job_descriptions %}
+            <div class="job-card">
+                <div class="job-title">{{ job.job_title }}</div>
+                {% if job.description %}
+                <div class="job-description">{{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}</div>
+                {% endif %}
+                <div class="job-meta">
+                    <div>📅 Created: {{ job.created_at.strftime('%B %d, %Y') }}</div>
+                    {% if job.required_experience %}
+                    <div>📊 Experience: {{ job.required_experience }}</div>
+                    {% endif %}
+                    {% if job.get_skills() %}
+                    <div>🔧 Skills: {{ job.get_skills()|length }} required</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h2>No Job Descriptions Yet</h2>
+            <p>Create job descriptions to use as templates for resume analysis.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
