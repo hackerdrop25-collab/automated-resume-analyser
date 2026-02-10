@@ -4,16 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Matching Analysis - Resume Analysis Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Resume Match Analysis - Premium Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00d2ff;
-            --secondary: #3a7bd5;
-            --bg-dark: #0f172a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #f8fafc;
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg-dark: #020617;
+            --sidebar-bg: rgba(15, 23, 42, 0.95);
+            --content-bg: #0b1120;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #00f2fe;
         }
 
         * {
@@ -24,438 +28,472 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2f4a 100%);
-            min-height: 100vh;
-            color: var(--text);
-            padding: 2rem;
-            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        /* Sidebar Styling */
+        .sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .resume-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .resume-item {
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.02);
             position: relative;
         }
 
-        .header {
-            margin-bottom: 2.5rem;
-            text-align: center;
+        .resume-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
         }
 
-        .header h1 {
-            font-size: 3rem;
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
+        .resume-item.active {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: rgba(0, 242, 254, 0.2);
+            box-shadow: 0 4px 20px -5px rgba(0, 242, 254, 0.2);
         }
 
-        .breadcrumb {
-            color: #94a3b8;
-            font-size: 0.9rem;
+        .resume-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
         }
 
-        .breadcrumb a {
+        .resume-item .name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .resume-item .score-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.75rem;
+            font-weight: 700;
             color: var(--primary);
-            text-decoration: none;
         }
 
-        /* Navigation Controls */
-        .nav-controls {
+        /* Main Content Styling */
+        .main-content {
+            flex: 1;
+            background: var(--content-bg);
+            overflow-y: auto;
+            position: relative;
+            padding-bottom: 4rem;
+        }
+
+        .top-nav {
+            padding: 1.5rem 3rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            background: var(--glass);
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
+            background: rgba(11, 17, 32, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        .nav-info {
-            font-weight: 500;
-            color: #94a3b8;
-        }
-
-        .nav-info span {
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        .nav-btns {
-            display: flex;
-            gap: 1rem;
-        }
-
-        /* Analysis Cards Wrapper */
-        .analysis-wrapper {
-            position: relative;
-            min-height: 600px;
-        }
-
-        .analysis-card {
+        .analysis-panel {
+            padding: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
             display: none;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            padding: 2.5rem;
-            border-radius: 20px;
-            margin-bottom: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
             transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .analysis-card.active {
+        .analysis-panel.active {
             display: block;
             opacity: 1;
             transform: translateY(0);
-            animation: fadeIn 0.5s ease-out forwards;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.98) translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        /* Dashboard Components */
+        .hero-section {
+            margin-bottom: 3rem;
         }
 
-        .score-section {
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
-        .score-card {
-            background: rgba(255, 255, 255, 0.03);
+        .stat-card {
+            background: var(--glass);
             border: 1px solid var(--glass-border);
-            padding: 1.5rem;
-            border-radius: 16px;
+            padding: 2rem;
+            border-radius: 20px;
             text-align: center;
             transition: transform 0.3s;
         }
 
-        .score-card:hover {
+        .stat-card:hover {
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--primary);
         }
 
-        .score-label {
+        .stat-label {
+            color: var(--text-muted);
             font-size: 0.8rem;
-            color: #94a3b8;
-            margin-bottom: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
         }
 
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: var(--text);
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(to bottom, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .score-indicator {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 1rem;
-            overflow: hidden;
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .score-progress {
-            height: 100%;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            border-radius: 2px;
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring circle {
+            fill: transparent;
+            stroke-width: 8;
+            stroke: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-ring .progress {
+            stroke: var(--primary);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+
+        .section {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
         }
 
         .section-title {
-            font-size: 1.4rem;
-            margin-bottom: 1.2rem;
-            color: var(--primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .list-item {
-            padding: 0.85rem 0;
-            color: #cbd5e1;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            font-size: 1rem;
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .icon {
-            flex-shrink: 0;
-            width: 24px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .strength-icon {
-            color: #4ade80;
-            background: rgba(74, 222, 128, 0.1);
-        }
-
-        .weakness-icon {
-            color: #f87171;
-            background: rgba(248, 113, 113, 0.1);
-        }
-
-        .info-icon {
+        .section-title i {
             color: var(--primary);
-            background: rgba(0, 210, 255, 0.1);
         }
 
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
+        .summary-text {
+            line-height: 1.8;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .list-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .pill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .pill {
+            padding: 0.6rem 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
             font-size: 0.9rem;
-            cursor: pointer;
+            color: #cbd5e1;
             transition: all 0.2s;
+        }
+
+        .pill:hover {
+            border-color: var(--primary);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .pill-green {
+            color: #4ade80;
+            border-color: rgba(74, 222, 128, 0.2);
+        }
+
+        .pill-red {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.2);
+        }
+
+        .btn-back {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            text-decoration: none;
         }
 
-        .btn-primary {
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            color: #0f172a;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            border: 1px solid var(--glass-border);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
+        .btn-back:hover {
             background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-4px);
         }
 
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            filter: grayscale(1);
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .resume-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .resume-info h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .resume-filename {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 1rem;
-            margin-top: 3rem;
-            justify-content: center;
-        }
-
-        .summary-box {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary);
-            line-height: 1.7;
-            color: #cbd5e1;
-            margin-bottom: 2rem;
+        .resume-item {
+            animation: slideIn 0.3s ease-out forwards;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Analysis Report</h1>
-            <p class="breadcrumb"><a href="/">Dashboard</a> / Results</p>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Analysis Center</h2>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">One-by-one Resume Review</p>
         </div>
-
-        {% if analyses %}
-        <div class="nav-controls">
-            <div class="nav-info">
-                Displaying Resume <span id="current-idx">1</span> of <span>{{ analyses|length }}</span>
-            </div>
-            <div class="nav-btns">
-                <button id="prev-btn" class="btn btn-secondary" onclick="changeResume(-1)" disabled>
-                    ← Previous
-                </button>
-                <button id="next-btn" class="btn btn-primary" onclick="changeResume(1)" {% if analyses|length <=1
-                    %}disabled{% endif %}>
-                    Next →
-                </button>
-            </div>
-        </div>
-
-        <div class="analysis-wrapper">
-            {% for analysis_data in analyses %}
-            <div class="analysis-card {% if loop.first %}active{% endif %}" id="card-{{ loop.index0 }}">
-                <div class="resume-header">
-                    <div class="resume-info">
-                        <h2>{{ analysis_data.resume_filename }}</h2>
-                        <span class="resume-filename">Analysis Completed</span>
-                    </div>
-                </div>
-
-                <div class="score-section">
-                    <div class="score-card">
-                        <div class="score-label">Overall Match</div>
-                        <div class="score-value">{{ analysis_data.analysis.overall_score or '0' }}%</div>
-                        <div class="score-indicator">
-                            <div class="score-progress"
-                                style="width: {{ analysis_data.analysis.overall_score or 0 }}%;"></div>
-                        </div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-label">Technical</div>
-                        <div class="score-value">{{ analysis_data.analysis.technical_score or '0' }}%</div>
-                        <div class="score-indicator">
-                            <div class="score-progress"
-                                style="width: {{ analysis_data.analysis.technical_score or 0 }}%;"></div>
-                        </div>
-                    </div>
-                    <div class="score-card">
-                        <div class="score-label">Experience</div>
-                        <div class="score-value">{{ analysis_data.analysis.experience_score or '0' }}%</div>
-                        <div class="score-indicator">
-                            <div class="score-progress"
-                                style="width: {{ analysis_data.analysis.experience_score or 0 }}%;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                {% if analysis_data.analysis.summary %}
-                <div class="summary-box">
-                    {{ analysis_data.analysis.summary }}
-                </div>
-                {% endif %}
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                    <div>
-                        <h3 class="section-title">
-                            <span class="icon strength-icon">✓</span> Strengths
-                        </h3>
-                        {% for strength in analysis_data.analysis.strengths %}
-                        <div class="list-item">
-                            <span>{{ strength }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <div>
-                        <h3 class="section-title">
-                            <span class="icon weakness-icon">!</span> Improvements
-                        </h3>
-                        {% for weakness in analysis_data.analysis.weaknesses %}
-                        <div class="list-item">
-                            <span>{{ weakness }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <h3 class="section-title">
-                        <span class="icon info-icon">→</span> Recommendations
-                    </h3>
-                    {% for rec in analysis_data.analysis.recommendations %}
-                    <div class="list-item">
-                        <span>{{ rec }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
+        <div class="resume-list">
+            {% for data in analyses %}
+            <div class="resume-item {% if loop.first %}active{% endif %}"
+                onclick="showAnalysis({{ loop.index0 }}, this)">
+                <div class="name">{{ data.resume_filename }}</div>
+                <div class="score-badge">Match: {{ data.analysis.overall_score }}%</div>
             </div>
             {% endfor %}
         </div>
+        <div style="padding: 1.5rem; border-top: 1px solid var(--glass-border);">
+            <a href="/upload" class="btn-back"
+                style="justify-content: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #020617; border: none;">
+                New Upload
+            </a>
+        </div>
+    </div>
 
-        <div class="action-btns">
-            <a href="/" class="btn btn-secondary">Analyze More</a>
-            <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-nav">
+            <a href="/dashboard" class="btn-back">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M19 12H5m7-7l-7 7 7 7"></path>
+                </svg>
+                Exit to Dashboard
+            </a>
+            <div id="active-filename" style="font-weight: 600; font-size: 1.1rem;">{{ analyses[0].resume_filename if
+                analyses else '' }}</div>
         </div>
 
-        {% else %}
-        <div class="analysis-card active" style="text-align: center; padding: 4rem;">
-            <h2 style="margin-bottom: 1rem;">No Results Found</h2>
-            <p style="color: #94a3b8; margin-bottom: 2rem;">It seems no resumes were processed or an error occurred.</p>
-            <a href="/" class="btn btn-primary" style="display: inline-flex;">Go Back to Upload</a>
+        <div id="panels-container">
+            {% if analyses %}
+            {% for data in analyses %}
+            <div class="analysis-panel {% if loop.first %}active{% endif %}" id="panel-{{ loop.index0 }}"
+                style="display: {% if loop.first %}block{% else %}none{% endif %};">
+                <div class="hero-section">
+                    <h1>{{ data.resume_filename }}</h1>
+                    <p style="color: var(--text-muted);">Detailed AI compatibility insights</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="progress-ring">
+                            <svg width="120" height="120">
+                                <circle cx="60" cy="60" r="54"></circle>
+                                <circle class="progress" cx="60" cy="60" r="54"
+                                    style="stroke-dasharray: 339.292; stroke-dashoffset: {{ 339.292 * (1 - (data.analysis.overall_score|default(0)) / 100) }}">
+                                </circle>
+                            </svg>
+                            <div style="position: absolute; font-size: 1.5rem; font-weight: 700;">{{
+                                data.analysis.overall_score|default(0) }}%</div>
+                        </div>
+                        <div class="stat-label">Overall Compatibility</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ data.analysis.technical_score|default(0) }}%</div>
+                        <div class="stat-label">Technical Precision</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ data.analysis.experience_score|default(0) }}%</div>
+                        <div class="stat-label">Relevant Tenure</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Executive Summary</h3>
+                    <p class="summary-text">{{ data.analysis.summary }}</p>
+                </div>
+
+                <div class="list-container">
+                    <div class="section">
+                        <h3 class="section-title" style="color: #4ade80;">Core Strengths</h3>
+                        <div class="pill-list">
+                            {% if data.analysis.strengths is string %}
+                            {% set strengths = data.analysis.strengths|from_json %}
+                            {% else %}
+                            {% set strengths = data.analysis.strengths %}
+                            {% endif %}
+
+                            {% for strength in strengths %}
+                            <div class="pill pill-green">{{ strength }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="section">
+                        <h3 class="section-title" style="color: #f87171;">Optimization Items</h3>
+                        <div class="pill-list">
+                            {% if data.analysis.weaknesses is string %}
+                            {% set weaknesses = data.analysis.weaknesses|from_json %}
+                            {% else %}
+                            {% set weaknesses = data.analysis.weaknesses %}
+                            {% endif %}
+
+                            {% for weakness in weaknesses %}
+                            <div class="pill pill-red">{{ weakness }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Strategic Recommendations</h3>
+                    <ul style="list-style: none; color: #cbd5e1;">
+                        {% if data.analysis.recommendations is string %}
+                        {% set recs = data.analysis.recommendations|from_json %}
+                        {% else %}
+                        {% set recs = data.analysis.recommendations %}
+                        {% endif %}
+
+                        {% for rec in recs %}
+                        <li
+                            style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 12px;">
+                            <span style="color: var(--primary); font-weight: bold;">→</span>
+                            {{ rec }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align: center; padding: 5rem;">
+                <h2>No analysis data available.</h2>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Please upload resumes to start the process.</p>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 
     <script>
-        let currentIdx = 0;
-        const total = {{ analyses| length if analyses else 0 }};
-        const cards = document.querySelectorAll('.analysis-card');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const currentIdxSpan = document.getElementById('current-idx');
+        function showAnalysis(index, element) {
+            // Update sidebar UI
+            document.querySelectorAll('.resume-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
 
-        function changeResume(delta) {
-            // Hide current
-            cards[currentIdx].classList.remove('active');
+            // Update panels
+            const panels = document.querySelectorAll('.analysis-panel');
+            const targetPanel = document.getElementById(`panel-${index}`);
 
-            // Update index
-            currentIdx += delta;
+            panels.forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
 
-            // Show new
-            cards[currentIdx].classList.add('active');
+            targetPanel.style.display = 'block';
+            // Trigger reflow
+            targetPanel.offsetHeight;
+            targetPanel.classList.add('active');
 
-            // Update UI
-            currentIdxSpan.textContent = currentIdx + 1;
+            // Update sticky header filename
+            const filename = element.querySelector('.name').textContent;
+            document.getElementById('active-filename').textContent = filename;
 
-            // Update buttons
-            prevBtn.disabled = currentIdx === 0;
-            nextBtn.disabled = currentIdx === total - 1;
-
-            // Scroll to top of card
-            window.scrollTo({ top: 200, behavior: 'smooth' });
+            // Smooth scroll main content to top
+            document.querySelector('.main-content').scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
-</body>
-
-</html>
-</div>
 </body>
 
 </html>

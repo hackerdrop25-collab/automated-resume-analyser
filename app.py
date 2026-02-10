@@ -124,27 +124,51 @@ def upload_resume():
                     # Perform analysis
                     analysis = analyze_resume(filepath, job_title, experience, certifications, project_description)
                     
+                    # Normalize analysis data for storage and template
+                    # Gemini returns keys like 'score', 'key_metrics', etc.
+                    metrics = analysis.get('key_metrics', {})
+                    skills_analysis = analysis.get('skills_analysis', {})
+                    
+                    overall_score = analysis.get('score', 0)
+                    tech_score = metrics.get('technical_match', 0)
+                    exp_score = metrics.get('experience_match', 0)
+                    fmt_score = metrics.get('formatting_score', 0)
+                    
                     # Store analysis result in database
                     analysis_result = AnalysisResult(
                         user_id=current_user.id,
                         resume_id=resume.id,
-                        technical_score=analysis.get('technical_score'),
-                        experience_score=analysis.get('experience_score'),
-                        formatting_score=analysis.get('formatting_score'),
-                        overall_score=analysis.get('overall_score'),
+                        technical_score=tech_score,
+                        experience_score=exp_score,
+                        formatting_score=fmt_score,
+                        overall_score=overall_score,
                         summary=analysis.get('summary'),
                         strengths=json.dumps(analysis.get('strengths', [])),
                         weaknesses=json.dumps(analysis.get('weaknesses', [])),
                         recommendations=json.dumps(analysis.get('recommendations', [])),
-                        matched_skills=json.dumps(analysis.get('matched_skills', [])),
-                        missing_skills=json.dumps(analysis.get('missing_skills', []))
+                        matched_skills=json.dumps(skills_analysis.get('matched_technical_skills', [])),
+                        missing_skills=json.dumps(skills_analysis.get('missing_critical_skills', []))
                     )
                     db.session.add(analysis_result)
                     
+                    # Store processed data for the immediate response
+                    processed_analysis = {
+                        'overall_score': overall_score,
+                        'technical_score': tech_score,
+                        'experience_score': exp_score,
+                        'formatting_score': fmt_score,
+                        'summary': analysis.get('summary'),
+                        'strengths': analysis.get('strengths', []),
+                        'weaknesses': analysis.get('weaknesses', []),
+                        'recommendations': analysis.get('recommendations', []),
+                        'matched_skills': skills_analysis.get('matched_technical_skills', []),
+                        'missing_skills': skills_analysis.get('missing_critical_skills', [])
+                    }
+                    
                     all_analyses.append({
-                        'analysis': analysis,
+                        'analysis': processed_analysis,
                         'resume_filename': original_filename,
-                        'analysis_id': None  # Will be set after commit
+                        'analysis_id': None
                     })
                     resume_ids.append(resume.id)
                     
