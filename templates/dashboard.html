@@ -112,46 +112,28 @@
     <div class="container">
         <nav>
             <div class="logo">Resume Analysis Pro</div>
-            <div style="display: flex; gap: 1.5rem;">
-                <a href="/" style="color: #cbd5e1; text-decoration: none;">New Analysis</a>
-                <a href="/logout" style="color: #f87171; text-decoration: none;">Logout</a>
-            </div>
         </nav>
 
         <div class="card">
-            <h1 style="font-size: 1.75rem; margin-bottom: 1rem;">Analysis History</h1>
-
-            {% if histories %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Job Title</th>
-                        <th>Resumes</th>
-                        <th>Date</th>
-                        <th>Avg. Match</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for h in histories %}
-                    <tr>
-                        <td>{{ h.job_title }}</td>
-                        <td>{{ h.parsed_data|length }}</td>
-                        <td style="font-size: 0.85rem; color: #94a3b8;">{{ h.timestamp.strftime('%Y-%m-%d %H:%M') }}
-                        </td>
-                        <td><span class="badge">{{ (h.parsed_data|map(attribute='score')|sum /
-                                h.parsed_data|length)|round|int }}%</span></td>
-                        <td><a href="{{ url_for('reanalyze', history_id=h.id) }}" class="btn">Re-run</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="empty-state">
-                <p>No analysis history yet.</p>
-                <a href="/" class="btn" style="display: inline-block; margin-top: 1rem;">Perform First Analysis</a>
+            <h1 style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">Welcome to Resume Analysis Pro</h1>
+            <p style="text-align: center; color: #94a3b8; margin-bottom: 3rem; font-size: 1.05rem;">Upload your resume and get instant matching analysis against job requirements</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 2rem; background: rgba(0, 210, 255, 0.05); border-radius: 12px; border: 1px solid rgba(0, 210, 255, 0.1);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+                    <div style="color: #cbd5e1; font-size: 0.9rem;">Upload Your Resume</div>
+                </div>
+                <div style="text-align: center; padding: 2rem; background: rgba(58, 123, 213, 0.05); border-radius: 12px; border: 1px solid rgba(58, 123, 213, 0.1);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
+                    <div style="color: #cbd5e1; font-size: 0.9rem;">Get Instant Analysis</div>
+                </div>
+                <div style="text-align: center; padding: 2rem; background: rgba(74, 222, 128, 0.05); border-radius: 12px; border: 1px solid rgba(74, 222, 128, 0.1);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⭐</div>
+                    <div style="color: #cbd5e1; font-size: 0.9rem;">See Match Score</div>
+                </div>
             </div>
-            {% endif %}
+
+            <a href="/upload" class="btn" style="display: block; text-align: center; padding: 1.2rem; font-size: 1rem; background: linear-gradient(to right, #00d2ff, #3a7bd5); border: none; cursor: pointer; color: #0f172a; text-decoration: none; font-weight: 600; border-radius: 10px; transition: all 0.3s;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)'">Start Analysis Now</a>
         </div>
     </div>
 </body>

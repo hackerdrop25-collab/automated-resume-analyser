@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Matching Analysis - Resume Analysis Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --bg-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2f4a 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .breadcrumb {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .score-card {
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            border-radius: 3px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .list-item {
+            padding: 0.75rem 0;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .strength {
+            color: #4ade80;
+        }
+
+        .weakness {
+            color: #f87171;
+        }
+
+        .recommendation {
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .summary-text {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .resume-filename {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Resume Matching Analysis</h1>
+            <p class="breadcrumb"><a href="/">Home</a> / Analysis Results</p>
+        </div>
+
+        {% if analyses %}
+        {% for analysis_data in analyses %}
+        <div class="card">
+            <p class="resume-filename">Resume: <strong>{{ analysis_data.resume_filename }}</strong></p>
+
+            <div class="score-section">
+                <div class="score-card">
+                    <div class="score-label">Overall Match</div>
+                    <div class="score-value">{{ analysis_data.analysis.overall_score or 'N/A' }}</div>
+                    {% if analysis_data.analysis.overall_score %}
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ analysis_data.analysis.overall_score }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="score-card">
+                    <div class="score-label">Technical Skills</div>
+                    <div class="score-value">{{ analysis_data.analysis.technical_score or 'N/A' }}</div>
+                    {% if analysis_data.analysis.technical_score %}
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ analysis_data.analysis.technical_score }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="score-card">
+                    <div class="score-label">Experience Match</div>
+                    <div class="score-value">{{ analysis_data.analysis.experience_score or 'N/A' }}</div>
+                    {% if analysis_data.analysis.experience_score %}
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ analysis_data.analysis.experience_score }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="score-card">
+                    <div class="score-label">Formatting Quality</div>
+                    <div class="score-value">{{ analysis_data.analysis.formatting_score or 'N/A' }}</div>
+                    {% if analysis_data.analysis.formatting_score %}
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ analysis_data.analysis.formatting_score }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if analysis_data.analysis.summary %}
+            <div style="margin-bottom: 2rem;">
+                <h3 class="section-title">Summary</h3>
+                <p class="summary-text">{{ analysis_data.analysis.summary }}</p>
+            </div>
+            {% endif %}
+
+            {% if analysis_data.analysis.get('matched_skills') %}
+            <div style="margin-bottom: 2rem;">
+                <h3 class="section-title">Matching Skills</h3>
+                <div>
+                    {% for skill in analysis_data.analysis.matched_skills %}
+                    <div class="list-item">
+                        <div class="icon strength">[+]</div>
+                        <span>{{ skill }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if analysis_data.analysis.get('strengths') %}
+            <div style="margin-bottom: 2rem;">
+                <h3 class="section-title">Strengths</h3>
+                <div>
+                    {% for strength in analysis_data.analysis.strengths %}
+                    <div class="list-item">
+                        <div class="icon strength">✓</div>
+                        <span>{{ strength }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if analysis_data.analysis.get('missing_skills') %}
+            <div style="margin-bottom: 2rem;">
+                <h3 class="section-title">Missing Skills</h3>
+                <div>
+                    {% for skill in analysis_data.analysis.missing_skills %}
+                    <div class="list-item">
+                        <div class="icon weakness">[-]</div>
+                        <span>{{ skill }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if analysis_data.analysis.get('weaknesses') %}
+            <div style="margin-bottom: 2rem;">
+                <h3 class="section-title">Areas to Improve</h3>
+                <div>
+                    {% for weakness in analysis_data.analysis.weaknesses %}
+                    <div class="list-item">
+                        <div class="icon weakness">!</div>
+                        <span>{{ weakness }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if analysis_data.analysis.get('recommendations') %}
+            <div style="margin-bottom: 2rem;">
+                <h3 class="section-title">Recommendations</h3>
+                <div>
+                    {% for rec in analysis_data.analysis.recommendations %}
+                    <div class="list-item">
+                        <div class="icon recommendation">→</div>
+                        <span>{{ rec }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="btn-group">
+                <a href="/" class="btn btn-primary">Analyze Another</a>
+                <a href="/" class="btn btn-secondary">Back Home</a>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="card">
+            <p style="text-align: center; color: #94a3b8;">No analysis results available.</p>
+            <div class="btn-group">
+                <a href="/" class="btn btn-primary">Upload Resume</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
