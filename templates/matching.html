@@ -28,19 +28,22 @@
             min-height: 100vh;
             color: var(--text);
             padding: 2rem;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
+            position: relative;
         }
 
         .header {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             background: linear-gradient(to right, #00d2ff, #3a7bd5);
             -webkit-background-clip: text;
             background-clip: text;
@@ -58,77 +61,138 @@
             text-decoration: none;
         }
 
-        .breadcrumb a:hover {
-            text-decoration: underline;
+        /* Navigation Controls */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background: var(--glass);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
         }
 
-        .card {
+        .nav-info {
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+        .nav-info span {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Analysis Cards Wrapper */
+        .analysis-wrapper {
+            position: relative;
+            min-height: 600px;
+        }
+
+        .analysis-card {
+            display: none;
             background: var(--glass);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            padding: 2rem;
-            border-radius: 16px;
+            padding: 2.5rem;
+            border-radius: 20px;
             margin-bottom: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .analysis-card.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .score-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
         }
 
         .score-card {
-            background: rgba(0, 210, 255, 0.1);
-            border: 1px solid rgba(0, 210, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .score-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
         }
 
         .score-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #94a3b8;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .score-value {
             font-size: 2.5rem;
             font-weight: 600;
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin-top: 0.75rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            border-radius: 3px;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
             color: var(--text);
         }
 
-        .list-item {
-            padding: 0.75rem 0;
-            color: #cbd5e1;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .score-indicator {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .score-progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 0.75rem;
+        }
+
+        .list-item {
+            padding: 0.85rem 0;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 1rem;
         }
 
         .list-item:last-child {
@@ -136,41 +200,45 @@
         }
 
         .icon {
-            width: 20px;
-            height: 20px;
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
 
-        .strength {
+        .strength-icon {
             color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
         }
 
-        .weakness {
+        .weakness-icon {
             color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
         }
 
-        .recommendation {
+        .info-icon {
             color: var(--primary);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
+            background: rgba(0, 210, 255, 0.1);
         }
 
         .btn {
-            flex: 1;
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             border: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
         }
 
         .btn-primary {
@@ -178,30 +246,60 @@
             color: #0f172a;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            opacity: 0.9;
+            box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             border: 1px solid var(--glass-border);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .summary-text {
-            color: #cbd5e1;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .resume-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .resume-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .resume-filename {
-            font-size: 0.85rem;
             color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            justify-content: center;
+        }
+
+        .summary-box {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            line-height: 1.7;
+            color: #cbd5e1;
             margin-bottom: 2rem;
         }
     </style>
@@ -210,150 +308,154 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Resume Matching Analysis</h1>
-            <p class="breadcrumb"><a href="/">Home</a> / Analysis Results</p>
+            <h1>Analysis Report</h1>
+            <p class="breadcrumb"><a href="/">Dashboard</a> / Results</p>
         </div>
 
         {% if analyses %}
-        {% for analysis_data in analyses %}
-        <div class="card">
-            <p class="resume-filename">Resume: <strong>{{ analysis_data.resume_filename }}</strong></p>
-
-            <div class="score-section">
-                <div class="score-card">
-                    <div class="score-label">Overall Match</div>
-                    <div class="score-value">{{ analysis_data.analysis.overall_score or 'N/A' }}</div>
-                    {% if analysis_data.analysis.overall_score %}
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ analysis_data.analysis.overall_score }}%;"></div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="score-card">
-                    <div class="score-label">Technical Skills</div>
-                    <div class="score-value">{{ analysis_data.analysis.technical_score or 'N/A' }}</div>
-                    {% if analysis_data.analysis.technical_score %}
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ analysis_data.analysis.technical_score }}%;"></div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="score-card">
-                    <div class="score-label">Experience Match</div>
-                    <div class="score-value">{{ analysis_data.analysis.experience_score or 'N/A' }}</div>
-                    {% if analysis_data.analysis.experience_score %}
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ analysis_data.analysis.experience_score }}%;"></div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="score-card">
-                    <div class="score-label">Formatting Quality</div>
-                    <div class="score-value">{{ analysis_data.analysis.formatting_score or 'N/A' }}</div>
-                    {% if analysis_data.analysis.formatting_score %}
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ analysis_data.analysis.formatting_score }}%;"></div>
-                    </div>
-                    {% endif %}
-                </div>
+        <div class="nav-controls">
+            <div class="nav-info">
+                Displaying Resume <span id="current-idx">1</span> of <span>{{ analyses|length }}</span>
             </div>
-
-            {% if analysis_data.analysis.summary %}
-            <div style="margin-bottom: 2rem;">
-                <h3 class="section-title">Summary</h3>
-                <p class="summary-text">{{ analysis_data.analysis.summary }}</p>
+            <div class="nav-btns">
+                <button id="prev-btn" class="btn btn-secondary" onclick="changeResume(-1)" disabled>
+                    ← Previous
+                </button>
+                <button id="next-btn" class="btn btn-primary" onclick="changeResume(1)" {% if analyses|length <=1
+                    %}disabled{% endif %}>
+                    Next →
+                </button>
             </div>
-            {% endif %}
+        </div>
 
-            {% if analysis_data.analysis.get('matched_skills') %}
-            <div style="margin-bottom: 2rem;">
-                <h3 class="section-title">Matching Skills</h3>
-                <div>
-                    {% for skill in analysis_data.analysis.matched_skills %}
-                    <div class="list-item">
-                        <div class="icon strength">[+]</div>
-                        <span>{{ skill }}</span>
+        <div class="analysis-wrapper">
+            {% for analysis_data in analyses %}
+            <div class="analysis-card {% if loop.first %}active{% endif %}" id="card-{{ loop.index0 }}">
+                <div class="resume-header">
+                    <div class="resume-info">
+                        <h2>{{ analysis_data.resume_filename }}</h2>
+                        <span class="resume-filename">Analysis Completed</span>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            {% endif %}
 
-            {% if analysis_data.analysis.get('strengths') %}
-            <div style="margin-bottom: 2rem;">
-                <h3 class="section-title">Strengths</h3>
-                <div>
-                    {% for strength in analysis_data.analysis.strengths %}
-                    <div class="list-item">
-                        <div class="icon strength">✓</div>
-                        <span>{{ strength }}</span>
+                <div class="score-section">
+                    <div class="score-card">
+                        <div class="score-label">Overall Match</div>
+                        <div class="score-value">{{ analysis_data.analysis.overall_score or '0' }}%</div>
+                        <div class="score-indicator">
+                            <div class="score-progress"
+                                style="width: {{ analysis_data.analysis.overall_score or 0 }}%;"></div>
+                        </div>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            {% if analysis_data.analysis.get('missing_skills') %}
-            <div style="margin-bottom: 2rem;">
-                <h3 class="section-title">Missing Skills</h3>
-                <div>
-                    {% for skill in analysis_data.analysis.missing_skills %}
-                    <div class="list-item">
-                        <div class="icon weakness">[-]</div>
-                        <span>{{ skill }}</span>
+                    <div class="score-card">
+                        <div class="score-label">Technical</div>
+                        <div class="score-value">{{ analysis_data.analysis.technical_score or '0' }}%</div>
+                        <div class="score-indicator">
+                            <div class="score-progress"
+                                style="width: {{ analysis_data.analysis.technical_score or 0 }}%;"></div>
+                        </div>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            {% if analysis_data.analysis.get('weaknesses') %}
-            <div style="margin-bottom: 2rem;">
-                <h3 class="section-title">Areas to Improve</h3>
-                <div>
-                    {% for weakness in analysis_data.analysis.weaknesses %}
-                    <div class="list-item">
-                        <div class="icon weakness">!</div>
-                        <span>{{ weakness }}</span>
+                    <div class="score-card">
+                        <div class="score-label">Experience</div>
+                        <div class="score-value">{{ analysis_data.analysis.experience_score or '0' }}%</div>
+                        <div class="score-indicator">
+                            <div class="score-progress"
+                                style="width: {{ analysis_data.analysis.experience_score or 0 }}%;"></div>
+                        </div>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            {% endif %}
 
-            {% if analysis_data.analysis.get('recommendations') %}
-            <div style="margin-bottom: 2rem;">
-                <h3 class="section-title">Recommendations</h3>
-                <div>
+                {% if analysis_data.analysis.summary %}
+                <div class="summary-box">
+                    {{ analysis_data.analysis.summary }}
+                </div>
+                {% endif %}
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div>
+                        <h3 class="section-title">
+                            <span class="icon strength-icon">✓</span> Strengths
+                        </h3>
+                        {% for strength in analysis_data.analysis.strengths %}
+                        <div class="list-item">
+                            <span>{{ strength }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <h3 class="section-title">
+                            <span class="icon weakness-icon">!</span> Improvements
+                        </h3>
+                        {% for weakness in analysis_data.analysis.weaknesses %}
+                        <div class="list-item">
+                            <span>{{ weakness }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 class="section-title">
+                        <span class="icon info-icon">→</span> Recommendations
+                    </h3>
                     {% for rec in analysis_data.analysis.recommendations %}
                     <div class="list-item">
-                        <div class="icon recommendation">→</div>
                         <span>{{ rec }}</span>
                     </div>
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
-
-            <div class="btn-group">
-                <a href="/" class="btn btn-primary">Analyze Another</a>
-                <a href="/" class="btn btn-secondary">Back Home</a>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+
+        <div class="action-btns">
+            <a href="/" class="btn btn-secondary">Analyze More</a>
+            <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+        </div>
 
         {% else %}
-        <div class="card">
-            <p style="text-align: center; color: #94a3b8;">No analysis results available.</p>
-            <div class="btn-group">
-                <a href="/" class="btn btn-primary">Upload Resume</a>
-            </div>
+        <div class="analysis-card active" style="text-align: center; padding: 4rem;">
+            <h2 style="margin-bottom: 1rem;">No Results Found</h2>
+            <p style="color: #94a3b8; margin-bottom: 2rem;">It seems no resumes were processed or an error occurred.</p>
+            <a href="/" class="btn btn-primary" style="display: inline-flex;">Go Back to Upload</a>
         </div>
         {% endif %}
     </div>
+
+    <script>
+        let currentIdx = 0;
+        const total = {{ analyses| length if analyses else 0 }};
+        const cards = document.querySelectorAll('.analysis-card');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentIdxSpan = document.getElementById('current-idx');
+
+        function changeResume(delta) {
+            // Hide current
+            cards[currentIdx].classList.remove('active');
+
+            // Update index
+            currentIdx += delta;
+
+            // Show new
+            cards[currentIdx].classList.add('active');
+
+            // Update UI
+            currentIdxSpan.textContent = currentIdx + 1;
+
+            // Update buttons
+            prevBtn.disabled = currentIdx === 0;
+            nextBtn.disabled = currentIdx === total - 1;
+
+            // Scroll to top of card
+            window.scrollTo({ top: 200, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
+</div>
 </body>
 
 </html>
