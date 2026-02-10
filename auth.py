@@ -8,27 +8,18 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    """Register a new user"""
+    """Register a new user with email and password only"""
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
         
         # Validation
-        if not username:
-            flash('Username is required', 'danger')
-            return redirect(url_for('auth.register'))
-        
-        if len(username) < 3:
-            flash('Username must be at least 3 characters long', 'danger')
-            return redirect(url_for('auth.register'))
-        
-        if not email or '@' not in email:
-            flash('Valid email is required', 'danger')
+        if not email or '@' not in email or '.' not in email:
+            flash('Valid email address is required', 'danger')
             return redirect(url_for('auth.register'))
         
         if len(password) < 6:
@@ -39,18 +30,14 @@ def register():
             flash('Passwords do not match', 'danger')
             return redirect(url_for('auth.register'))
         
-        # Check if user exists
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'danger')
-            return redirect(url_for('auth.register'))
-        
+        # Check if email already exists
         if User.query.filter_by(email=email).first():
-            flash('Email already registered', 'danger')
+            flash('Email already registered. Please log in.', 'danger')
             return redirect(url_for('auth.register'))
         
         # Create new user
         try:
-            user = User(username=username, email=email)
+            user = User(email=email)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
@@ -67,26 +54,26 @@ def register():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Login user"""
+    """Login user with email and password"""
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         
-        if not username or not password:
-            flash('Username and password are required', 'danger')
+        if not email or not password:
+            flash('Email and password are required', 'danger')
             return redirect(url_for('auth.login'))
         
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
         
         if user and user.check_password(password):
             login_user(user, remember=request.form.get('remember'))
-            flash(f'Welcome back, {user.username}!', 'success')
-            return redirect(url_for('main.dashboard'))
+            flash(f'Welcome back!', 'success')
+            return redirect(url_for('dashboard'))
         else:
-            flash('Invalid username or password', 'danger')
+            flash('Invalid email or password', 'danger')
             return redirect(url_for('auth.login'))
     
     return render_template('login.html')

@@ -13,7 +13,7 @@ def init_db():
     with app.app_context():
         print("Creating database tables...")
         db.create_all()
-        print("✓ Database tables created successfully")
+        print("[OK] Database tables created successfully")
 
 
 def drop_db():
@@ -23,7 +23,7 @@ def drop_db():
         with app.app_context():
             print("Dropping all database tables...")
             db.drop_all()
-            print("✓ All tables dropped")
+            print("[OK] All tables dropped")
     else:
         print("Operation cancelled")
 
@@ -36,7 +36,7 @@ def reset_db():
             print("Resetting database...")
             db.drop_all()
             db.create_all()
-            print("✓ Database reset successfully")
+            print("[OK] Database reset successfully")
     else:
         print("Operation cancelled")
 
@@ -44,25 +44,24 @@ def reset_db():
 def create_test_user():
     """Create a test user"""
     with app.app_context():
-        username = input("Enter username: ").strip()
         email = input("Enter email: ").strip()
         password = input("Enter password: ").strip()
         
-        if not username or not email or not password:
+        if not email or not password:
             print("All fields are required")
             return
         
         # Check if user exists
-        if User.query.filter_by(username=username).first():
-            print(f"User '{username}' already exists")
+        if User.query.filter_by(email=email).first():
+            print(f"User '{email}' already exists")
             return
         
         try:
-            user = User(username=username, email=email)
+            user = User(email=email)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
-            print(f"✓ Test user '{username}' created successfully")
+            print(f"[OK] Test user '{email}' created successfully")
         except Exception as e:
             db.session.rollback()
             print(f"Error creating user: {e}")
