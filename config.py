@@ -8,14 +8,19 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     
     # Database configuration
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    INSTANCE_PATH = os.path.join(BASE_DIR, 'instance')
+    os.makedirs(INSTANCE_PATH, exist_ok=True)
+    
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'sqlite:///instance/resume_analyzer.db'  # Default to SQLite
+        f'sqlite:///{os.path.join(INSTANCE_PATH, "resume_analyzer.db")}'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Upload configuration
-    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
+    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', os.path.join(BASE_DIR, 'uploads'))
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
     ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'txt'}
     

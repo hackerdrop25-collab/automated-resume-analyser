@@ -37,7 +37,6 @@ app.register_blueprint(auth_bp)
 # Create database tables and upload folder
 with app.app_context():
     db.create_all()
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 
 @app.route('/')
@@ -284,5 +283,4 @@ def server_error(error):
 
 
 if __name__ == '__main__':
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
