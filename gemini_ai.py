@@ -46,6 +46,65 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
         
         summary = f"Candidate displays exceptional alignment for the {job_title} position. Key technical skills align with the core requirements, particularly in modern frameworks and scalable architecture. The professional trajectory demonstrates consistent growth and successful project delivery."
         
+        # Generate role-specific mock projects
+        if "devops" in job_title.lower() or "sre" in job_title.lower():
+            mock_projects = [
+                {
+                    "project_name": "CI/CD Pipeline Automation",
+                    "relevance_score": 95,
+                    "description": "Built automated deployment pipeline reducing release time by 70%",
+                    "technologies": ["Jenkins", "Docker", "Kubernetes", "AWS"],
+                    "role_match_reason": "Directly aligns with DevOps automation and infrastructure requirements"
+                },
+                {
+                    "project_name": "Infrastructure as Code Implementation",
+                    "relevance_score": 88,
+                    "description": "Migrated infrastructure to Terraform, managing 200+ cloud resources",
+                    "technologies": ["Terraform", "AWS", "Python", "Ansible"],
+                    "role_match_reason": "Demonstrates expertise in IaC and cloud infrastructure management"
+                },
+                {
+                    "project_name": "Monitoring & Alerting System",
+                    "relevance_score": 82,
+                    "description": "Implemented comprehensive monitoring reducing incident response time by 60%",
+                    "technologies": ["Prometheus", "Grafana", "ELK Stack"],
+                    "role_match_reason": "Shows proficiency in observability and system reliability"
+                }
+            ]
+            filtered_count = 3
+            total_count = 7
+        elif "software" in job_title.lower() or "developer" in job_title.lower() or "engineer" in job_title.lower():
+            mock_projects = [
+                {
+                    "project_name": "E-commerce Platform Development",
+                    "relevance_score": 92,
+                    "description": "Built scalable e-commerce platform handling 10K+ daily transactions",
+                    "technologies": ["React", "Node.js", "PostgreSQL", "Redis"],
+                    "role_match_reason": "Demonstrates full-stack development expertise with modern technologies"
+                },
+                {
+                    "project_name": "Real-time Analytics Dashboard",
+                    "relevance_score": 85,
+                    "description": "Created real-time data visualization dashboard for business metrics",
+                    "technologies": ["JavaScript", "D3.js", "WebSocket", "MongoDB"],
+                    "role_match_reason": "Shows proficiency in frontend development and data handling"
+                }
+            ]
+            filtered_count = 2
+            total_count = 5
+        else:
+            mock_projects = [
+                {
+                    "project_name": "Enterprise System Integration",
+                    "relevance_score": 78,
+                    "description": "Integrated multiple legacy systems into unified platform",
+                    "technologies": ["Python", "REST API", "SQL", "Docker"],
+                    "role_match_reason": "Aligns with system integration and technical requirements"
+                }
+            ]
+            filtered_count = 1
+            total_count = 4
+        
         advice = [
             "Highlight core architectural decisions in recent projects.",
             "Quantify results on the first page of the resume for higher ATS optimization.",
@@ -69,6 +128,9 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
                 'missing_critical_skills': ["Advanced Kubernetes", "System Design Patterns"],
                 'soft_skills_detected': ["Active Collaboration", "Technical Leadership", "Problem Solving"]
             },
+            'relevant_projects': mock_projects,
+            'filtered_project_count': filtered_count,
+            'total_project_count': total_count,
             'strengths': [
                 "Strong technical foundation in modern stacks",
                 "Clear and professional resume formatting",
@@ -125,7 +187,11 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     You are a Senior Technical Recruiter with 20+ years of experience.
     Perform a rigorous analysis of this resume against the job requirements.
     
-    CRITICAL FOCUS: You must calculate an "Experience Match" based on the required {experience} years vs. what's in the resume.
+    CRITICAL FOCUS: 
+    1. Extract INDIVIDUAL PROJECTS from the resume
+    2. Score each project's relevance to the "{job_title}" role (0-100%)
+    3. ONLY include projects with relevance score > 60%
+    4. Calculate "Experience Match" based on required {experience} years vs. actual experience
 
     Job Profile:
     - Role: {job_title}
@@ -135,6 +201,9 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     
     Resume Content:
     {resume_text}
+    
+    IMPORTANT: For each project in the resume, evaluate if it's relevant to "{job_title}". 
+    Only include projects that directly relate to the job requirements.
     
     Provide the output in STRICT JSON format:
     {{
@@ -152,6 +221,17 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             "missing_critical_skills": ["list", "of", "missing"],
             "soft_skills_detected": ["list", "of", "soft", "skills"]
         }},
+        "relevant_projects": [
+            {{
+                "project_name": "Name of the project",
+                "relevance_score": (0-100, only include if > 60),
+                "description": "Brief description of what the project does",
+                "technologies": ["tech1", "tech2"],
+                "role_match_reason": "Why this project is relevant to {job_title}"
+            }}
+        ],
+        "filtered_project_count": (number of relevant projects included),
+        "total_project_count": (total number of projects found in resume),
         "strengths": ["point 1", "point 2"],
         "weaknesses": ["area 1", "area 2"],
         "recommendations": ["advice 1", "advice 2"],
