@@ -142,3 +142,21 @@ class AnalysisResult(db.Model):
     
     def __repr__(self):
         return f'<AnalysisResult {self.id} - Score: {self.overall_score}>'
+
+
+class SecurityLog(db.Model):
+    """SecurityLog model for audit trails of critical system operations"""
+    __tablename__ = 'security_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
+    event_type = db.Column(db.String(50), nullable=False)  # e.g., 'UPLOAD', 'ANALYSIS', 'LOGIN'
+    description = db.Column(db.Text, nullable=False)
+    ip_address = db.Column(db.String(45), nullable=True)  # Support for IPv6
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+    
+    # Relationship
+    user_rel = db.relationship('User', backref=db.backref('security_logs', lazy=True))
+    
+    def __repr__(self):
+        return f'<SecurityLog {self.event_type} - {self.timestamp}>'

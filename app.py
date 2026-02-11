@@ -5,7 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Import models and configuration
-from models import db, User, Resume, JobDescription, AnalysisResult
+from models import db, User, Resume, JobDescription, AnalysisResult, SecurityLog
 from config import get_config
 # auth blueprint removed — app will auto-login a default local user
 from storage import save_resume_file, delete_resume_file
@@ -61,6 +61,21 @@ def auto_login_default_user():
 
 
 
+def log_security_event(event_type, description):
+    """Utility to log system security events"""
+    try:
+        log = SecurityLog(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            event_type=event_type,
+            description=description,
+            ip_address=request.remote_addr
+        )
+        db.session.add(log)
+        db.session.commit()
+    except Exception as e:
+        app.logger.error(f"Failed to log security event: {str(e)}")
+
+
 @app.route('/')
 def index():
     """Home page - show dashboard"""
@@ -80,6 +95,7 @@ def upload_resume():
     """Upload and analyze resumes"""
     if request.method == 'POST':
         try:
+            log_security_event('UPLOAD_START', f"User starting upload of resumes.")
             num_resumes = int(request.form.get('num_resumes', 0))
             if num_resumes <= 0:
                 flash('Please specify at least one resume', 'warning')
@@ -122,7 +138,9 @@ def upload_resume():
                     db.session.flush()  # Get the resume ID
                     
                     # Perform analysis
+                    log_security_event('ANALYSIS_START', f"Starting AI analysis for resume: {original_filename}")
                     analysis = analyze_resume(filepath, job_title, experience, certifications, project_description)
+                    log_security_event('ANALYSIS_COMPLETE', f"Successfully analyzed resume: {original_filename}")
                     
                     # Normalize analysis data for storage and template
                     # Gemini returns keys like 'score', 'key_metrics', etc.
@@ -328,6 +346,14 @@ def get_analysis_data(analysis_id):
         },
         'analyzed_at': analysis.analyzed_at.isoformat()
     })
+
+
+@app.route('/admin/security')
+@login_required
+def security_audit():
+    """Security audit dashboard - view system logs"""
+    logs = SecurityLog.query.order_by(SecurityLog.timestamp.desc()).limit(100).all()
+    return render_template('security.html', logs=logs)
 
 
 @app.errorhandler(404)
