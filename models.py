@@ -107,6 +107,11 @@ class AnalysisResult(db.Model):
     matched_skills = db.Column(db.Text, nullable=True)  # JSON array
     missing_skills = db.Column(db.Text, nullable=True)  # JSON array
     
+    # New Fields for Project Differentiation
+    relevant_projects = db.Column(db.Text, nullable=True)  # JSON array
+    filtered_project_count = db.Column(db.Integer, default=0)
+    total_project_count = db.Column(db.Integer, default=0)
+    
     # Metadata
     analyzed_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -130,6 +135,10 @@ class AnalysisResult(db.Model):
     def get_missing_skills(self):
         """Parse missing skills JSON"""
         return json.loads(self.missing_skills) if self.missing_skills else []
+    
+    def get_relevant_projects(self):
+        """Parse relevant projects JSON"""
+        return json.loads(self.relevant_projects) if self.relevant_projects else []
     
     def __repr__(self):
         return f'<AnalysisResult {self.id} - Score: {self.overall_score}>'

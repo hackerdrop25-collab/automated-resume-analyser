@@ -147,7 +147,10 @@ def upload_resume():
                         weaknesses=json.dumps(analysis.get('weaknesses', [])),
                         recommendations=json.dumps(analysis.get('recommendations', [])),
                         matched_skills=json.dumps(skills_analysis.get('matched_technical_skills', [])),
-                        missing_skills=json.dumps(skills_analysis.get('missing_critical_skills', []))
+                        missing_skills=json.dumps(skills_analysis.get('missing_critical_skills', [])),
+                        relevant_projects=json.dumps(analysis.get('relevant_projects', [])),
+                        filtered_project_count=analysis.get('filtered_project_count', 0),
+                        total_project_count=analysis.get('total_project_count', 0)
                     )
                     db.session.add(analysis_result)
                     
@@ -162,7 +165,10 @@ def upload_resume():
                         'weaknesses': analysis.get('weaknesses', []),
                         'recommendations': analysis.get('recommendations', []),
                         'matched_skills': skills_analysis.get('matched_technical_skills', []),
-                        'missing_skills': skills_analysis.get('missing_critical_skills', [])
+                        'missing_skills': skills_analysis.get('missing_critical_skills', []),
+                        'relevant_projects': analysis.get('relevant_projects', []),
+                        'filtered_project_count': analysis.get('filtered_project_count', 0),
+                        'total_project_count': analysis.get('total_project_count', 0)
                     }
                     
                     all_analyses.append({
@@ -247,7 +253,10 @@ def view_latest_results():
             'weaknesses': result.get_weaknesses(),
             'recommendations': result.get_recommendations(),
             'matched_skills': result.get_matched_skills(),
-            'missing_skills': result.get_missing_skills()
+            'missing_skills': result.get_missing_skills(),
+            'relevant_projects': result.get_relevant_projects(),
+            'filtered_project_count': result.filtered_project_count,
+            'total_project_count': result.total_project_count
         }
         
         all_analyses.append({
@@ -276,7 +285,10 @@ def view_specific_result(resume_id):
         'weaknesses': result.get_weaknesses(),
         'recommendations': result.get_recommendations(),
         'matched_skills': result.get_matched_skills(),
-        'missing_skills': result.get_missing_skills()
+        'missing_skills': result.get_missing_skills(),
+        'relevant_projects': result.get_relevant_projects(),
+        'filtered_project_count': result.filtered_project_count,
+        'total_project_count': result.total_project_count
     }
     
     all_analyses = [{
