@@ -59,8 +59,6 @@ def auto_login_default_user():
         pass
 
 
-
-
 def log_security_event(event_type, description):
     """Utility to log system security events"""
     try:

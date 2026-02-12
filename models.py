@@ -29,9 +29,9 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         """Check if provided password matches the hash"""
         return check_password_hash(self.password_hash, password)
-    
+
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.email}>'
 
 
 class Resume(db.Model):

@@ -110,7 +110,6 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             "Quantify results on the first page of the resume for higher ATS optimization.",
             "Include more specific cloud-native toolsets if applicable."
         ]
-            
         overall = int((tech + exp + fmt) / 3)
         
         return {
@@ -148,12 +147,11 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             ]
         }
 
-    # Check for API key first
     current_api_key = os.getenv("GEMINI_API_KEY")
     if not current_api_key or "your_gemini_api_key_here" in current_api_key or current_api_key == "":
         print("INFO: Entering Professional Demo Mode.")
         return get_mock_analysis(is_error=False)
-    
+
     # Re-configure if key was added after startup
     genai.configure(api_key=current_api_key)
 
