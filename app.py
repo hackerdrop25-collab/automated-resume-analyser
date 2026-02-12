@@ -55,7 +55,6 @@ def auto_login_default_user():
             if user:
                 login_user(user)
     except Exception:
-        # if something goes wrong, continue — routes will handle auth assumptions
         pass
 
 

@@ -15,7 +15,6 @@ class NexusAnimation {
 
         this.init();
     }
-
     init() {
         this.particleCanvas.id = 'bg-animation-canvas';
         this.particleCanvas.style.position = 'fixed';
@@ -58,7 +57,6 @@ class NexusAnimation {
         this.height = this.particleCanvas.height = window.innerHeight;
         this.createParticles();
     }
-
     getThemeColors() {
         switch (this.theme) {
             case 'dark':

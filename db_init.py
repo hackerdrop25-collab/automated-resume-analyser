@@ -91,23 +91,18 @@ def main():
         'test-user': ('Create test user', create_test_user),
         'stats': ('Show database statistics', show_stats),
     }
-    
     if len(sys.argv) < 2:
         print("Database Management Tool\n")
         print("Available commands:")
         for cmd, (desc, _) in commands.items():
             print(f"  python db_init.py {cmd:<15} - {desc}")
         sys.exit(1)
-    
     command = sys.argv[1]
-    
     if command not in commands:
         print(f"Unknown command: {command}")
         print(f"Available commands: {', '.join(commands.keys())}")
         sys.exit(1)
-    
     commands[command][1]()
-
 
 if __name__ == '__main__':
     main()
