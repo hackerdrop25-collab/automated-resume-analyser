@@ -327,6 +327,38 @@
         .resume-item {
             animation: slideIn 0.3s ease-out forwards;
         }
+
+        /* Progress ring stroke mapping */
+        .progress-ring-circle {
+            stroke-dasharray: 339.292;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+
+        /* Project score badge gradients */
+        .score-gradient-high {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+        }
+
+        .score-gradient-med {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+        }
+
+        .score-gradient-low {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+        }
     </style>
 </head>
 
@@ -339,8 +371,7 @@
         </div>
         <div class="resume-list">
             {% for data in analyses %}
-            <div class="resume-item {% if loop.first %}active{% endif %}"
-                onclick="showAnalysis({{ loop.index0 }}, this)">
+            <div class="resume-item {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
                 <div class="name">{{ data.resume_filename }}</div>
                 <div class="score-badge">Match: {{ data.analysis.overall_score }}%</div>
             </div>
@@ -370,8 +401,7 @@
         <div id="panels-container">
             {% if analyses %}
             {% for data in analyses %}
-            <div class="analysis-panel {% if loop.first %}active{% endif %}" id="panel-{{ loop.index0 }}"
-                style="display: {% if loop.first %}block{% else %}none{% endif %};">
+            <div class="analysis-panel {% if loop.first %}active{% endif %}" id="panel-{{ loop.index0 }}">
                 <div class="hero-section">
                     <h1>{{ data.resume_filename }}</h1>
                     <p style="color: var(--text-muted);">Detailed AI compatibility insights</p>
@@ -382,8 +412,8 @@
                         <div class="progress-ring">
                             <svg width="120" height="120">
                                 <circle cx="60" cy="60" r="54"></circle>
-                                <circle class="progress" cx="60" cy="60" r="54"
-                                    style="stroke-dasharray: 339.292; stroke-dashoffset: {{ 339.292 * (1 - (data.analysis.overall_score|default(0)) / 100) }}">
+                                <circle class="progress progress-ring-circle" cx="60" cy="60" r="54"
+                                    style="stroke-dashoffset: {{ 339.292 * (1 - (data.analysis.overall_score|default(0)) / 100) }}">
                                 </circle>
                             </svg>
                             <div style="position: absolute; font-size: 1.5rem; font-weight: 700;">{{
@@ -423,15 +453,13 @@
 
                     <div style="display: grid; gap: 1.5rem;">
                         {% for project in data.analysis.relevant_projects %}
-                        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.75rem; transition: all 0.3s;"
-                            onmouseover="this.style.borderColor='rgba(0, 242, 254, 0.3)'; this.style.background='rgba(0, 242, 254, 0.05)';"
-                            onmouseout="this.style.borderColor='var(--glass-border)'; this.style.background='rgba(255, 255, 255, 0.02)';">
+                        <div class="project-card">
                             <div
                                 style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                                 <h4 style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">{{ project.project_name
                                     }}</h4>
-                                <div
-                                    style="background: {% if project.relevance_score >= 90 %}linear-gradient(135deg, #4ade80, #22c55e){% elif project.relevance_score >= 75 %}linear-gradient(135deg, #00f2fe, #4facfe){% else %}linear-gradient(135deg, #fbbf24, #f59e0b){% endif %}; padding: 0.4rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: #020617;">
+                                <div class="{% if project.relevance_score >= 90 %}score-gradient-high{% elif project.relevance_score >= 75 %}score-gradient-med{% else %}score-gradient-low{% endif %}"
+                                    style="padding: 0.4rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: #020617;">
                                     {{ project.relevance_score }}% Match
                                 </div>
                             </div>
@@ -540,6 +568,26 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resumeItems = document.querySelectorAll('.resume-item');
+
+            resumeItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    const index = this.getAttribute('data-index');
+                    showAnalysis(index, this);
+                });
+            });
+
+            // Initialize correct display states for panels
+            document.querySelectorAll('.analysis-panel').forEach(panel => {
+                if (panel.classList.contains('active')) {
+                    panel.style.display = 'block';
+                } else {
+                    panel.style.display = 'none';
+                }
+            });
+        });
+
         function showAnalysis(index, element) {
             // Update sidebar UI
             document.querySelectorAll('.resume-item').forEach(el => el.classList.remove('active'));
@@ -560,11 +608,17 @@
             targetPanel.classList.add('active');
 
             // Update sticky header filename
-            const filename = element.querySelector('.name').textContent;
-            document.getElementById('active-filename').textContent = filename;
+            const nameEl = element.querySelector('.name');
+            if (nameEl) {
+                const filename = nameEl.textContent;
+                document.getElementById('active-filename').textContent = filename;
+            }
 
             // Smooth scroll main content to top
-            document.querySelector('.main-content').scrollTo({ top: 0, behavior: 'smooth' });
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     </script>
 </body>
