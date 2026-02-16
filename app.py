@@ -82,15 +82,22 @@ def index():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    """Main dashboard - upload resume"""
-    return render_template('dashboard.html')
+    api_key = os.environ.get('GEMINI_API_KEY')
+    api_status = bool(api_key and "your_gemini_api_key_here" not in api_key and api_key != "")
+    return render_template('dashboard.html', api_status=api_status)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload_resume():
-    """Upload and analyze resumes"""
+    api_key = os.environ.get('GEMINI_API_KEY')
+    api_status = bool(api_key and "your_gemini_api_key_here" not in api_key and api_key != "")
+    
     if request.method == 'POST':
+        if not api_status:
+            flash('Real-world analysis requires a valid GEMINI_API_KEY. Please configure it in the system settings.', 'danger')
+            return redirect(url_for('upload_resume'))
+            
         try:
             log_security_event('UPLOAD_START', f"User starting upload of resumes.")
             num_resumes = int(request.form.get('num_resumes', 0))
@@ -181,8 +188,9 @@ def upload_resume():
                         'technical_score': tech_score,
                         'experience_score': exp_score,
                         'formatting_score': fmt_score,
+                        'advanced_match': adv_score,
                         'summary': analysis.get('summary'),
-                        'strengths': analysis.get('strengths', []),
+                        'strengths': strengths_list,
                         'weaknesses': analysis.get('weaknesses', []),
                         'recommendations': analysis.get('recommendations', []),
                         'matched_skills': skills_analysis.get('matched_technical_skills', []),

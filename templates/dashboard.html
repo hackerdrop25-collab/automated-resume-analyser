@@ -117,6 +117,25 @@
                 Security Audit</a>
         </nav>
 
+        {% if not api_status %}
+        <div
+            style="background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.2); padding: 1rem; border-radius: 12px; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+            <span style="font-size: 1.25rem;">⚠️</span>
+            <div>
+                <strong style="color: #f87171;">AI Engine Offline</strong>
+                <p style="color: #94a3b8; font-size: 0.9rem;">Missing GEMINI_API_KEY. Real-world analysis is disabled.
+                </p>
+            </div>
+        </div>
+        {% else %}
+        <div
+            style="background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.2); padding: 0.5rem 1rem; border-radius: 50px; margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
+            <span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 10px #4ade80;"></span>
+            <span style="color: #4ade80; font-weight: 600;">Neural Engine Ready</span>
+        </div>
+        {% endif %}
+
         <div class="card">
             <h1 style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">Welcome to Resume Analysis Pro</h1>
             <p style="text-align: center; color: #94a3b8; margin-bottom: 3rem; font-size: 1.05rem;">Upload your resume

@@ -169,7 +169,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
@@ -429,6 +429,11 @@
                     <div class="stat-card">
                         <div class="stat-value">{{ data.analysis.experience_score|default(0) }}%</div>
                         <div class="stat-label">Relevant Tenure</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: var(--primary);">{{
+                            data.analysis.advanced_match|default(0) }}%</div>
+                        <div class="stat-label">Advanced Verification</div>
                     </div>
                 </div>
 

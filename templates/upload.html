@@ -206,6 +206,24 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        .flash-message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .flash-danger {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+
+        .flash-success {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--primary);
+        }
     </style>
 </head>
 
@@ -218,11 +236,19 @@
         <p style="color: #64748b; margin-top: 1rem; font-weight: 500;">Synthesizing resume insights</p>
     </div>
 
-    <nav>
-        <div class="logo">RESUME ANALYZER AI</div>
     </nav>
 
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ 'danger' if category == 'danger' else 'success' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         <h1>Intelligent Analysis</h1>
 
         <form action="/upload" method="POST" enctype="multipart/form-data" id="analysis-form">
