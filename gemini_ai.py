@@ -4,10 +4,8 @@ import google.generativeai as genai
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Configure Gemini AI
 def get_api_key():
     load_dotenv()
     return os.getenv("GEMINI_API_KEY")
@@ -36,124 +34,11 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     """
     filename = os.path.basename(filepath)
     
-    # Mock analysis for Professional Demo Mode
-    def get_mock_analysis(is_error=False, error_msg=""):
-        import random
-        # Generate realistic randomized scores
-        tech = random.randint(75, 92)
-        exp = random.randint(70, 88)
-        fmt = random.randint(80, 95)
-        
-        summary = f"Candidate displays exceptional alignment for the {job_title} position. Key technical skills align with the core requirements, particularly in modern frameworks and scalable architecture. The professional trajectory demonstrates consistent growth and successful project delivery."
-        
-        # Generate role-specific mock projects
-        if "devops" in job_title.lower() or "sre" in job_title.lower():
-            mock_projects = [
-                {
-                    "project_name": "CI/CD Pipeline Automation",
-                    "relevance_score": 95,
-                    "description": "Built automated deployment pipeline reducing release time by 70%",
-                    "technologies": ["Jenkins", "Docker", "Kubernetes", "AWS"],
-                    "role_match_reason": "Directly aligns with DevOps automation and infrastructure requirements"
-                },
-                {
-                    "project_name": "Infrastructure as Code Implementation",
-                    "relevance_score": 88,
-                    "description": "Migrated infrastructure to Terraform, managing 200+ cloud resources",
-                    "technologies": ["Terraform", "AWS", "Python", "Ansible"],
-                    "role_match_reason": "Demonstrates expertise in IaC and cloud infrastructure management"
-                },
-                {
-                    "project_name": "Monitoring & Alerting System",
-                    "relevance_score": 82,
-                    "description": "Implemented comprehensive monitoring reducing incident response time by 60%",
-                    "technologies": ["Prometheus", "Grafana", "ELK Stack"],
-                    "role_match_reason": "Shows proficiency in observability and system reliability"
-                }
-            ]
-            filtered_count = 3
-            total_count = 7
-        elif "software" in job_title.lower() or "developer" in job_title.lower() or "engineer" in job_title.lower():
-            mock_projects = [
-                {
-                    "project_name": "E-commerce Platform Development",
-                    "relevance_score": 92,
-                    "description": "Built scalable e-commerce platform handling 10K+ daily transactions",
-                    "technologies": ["React", "Node.js", "PostgreSQL", "Redis"],
-                    "role_match_reason": "Demonstrates full-stack development expertise with modern technologies"
-                },
-                {
-                    "project_name": "Real-time Analytics Dashboard",
-                    "relevance_score": 85,
-                    "description": "Created real-time data visualization dashboard for business metrics",
-                    "technologies": ["JavaScript", "D3.js", "WebSocket", "MongoDB"],
-                    "role_match_reason": "Shows proficiency in frontend development and data handling"
-                }
-            ]
-            filtered_count = 2
-            total_count = 5
-        else:
-            mock_projects = [
-                {
-                    "project_name": "Enterprise System Integration",
-                    "relevance_score": 78,
-                    "description": "Integrated multiple legacy systems into unified platform",
-                    "technologies": ["Python", "REST API", "SQL", "Docker"],
-                    "role_match_reason": "Aligns with system integration and technical requirements"
-                }
-            ]
-            filtered_count = 1
-            total_count = 4
-        
-        advice = [
-            "Highlight core architectural decisions in recent projects.",
-            "Quantify results on the first page of the resume for higher ATS optimization.",
-            "Include more specific cloud-native toolsets if applicable."
-        ]
-        overall = int((tech + exp + fmt) / 3)
-        
-        return {
-            'filename': filename,
-            'job_title': job_title,
-            'summary': summary + " \n\nAdvanced Source Verification: Verified GitHub activity confirms high engagement in open-source projects. LinkedIn profile aligns with resume timeline.",
-            'score': overall,
-            'key_metrics': {
-                'technical_match': tech,
-                'experience_match': exp,
-                'formatting_score': fmt,
-                'advanced_source_match': random.randint(85, 98)
-            },
-            'skills_analysis': {
-                'matched_technical_skills': ["Python", "JavaScript", "SQL", "Docker", "Git", "Advanced System Design"],
-                'missing_critical_skills': ["Advanced Kubernetes"],
-                'soft_skills_detected': ["Active Collaboration", "Technical Leadership", "Problem Solving"]
-            },
-            'relevant_projects': mock_projects,
-            'filtered_project_count': filtered_count,
-            'total_project_count': total_count,
-            'strengths': [
-                "Strong technical foundation in modern stacks",
-                "Clear and professional resume formatting",
-                "Demonstrated project leadership experience",
-                "Verified High GitHub Activity",
-                "Consistent Career Progression (LinkedIn Verified)"
-            ],
-            'weaknesses': [
-                "Niche technology certifications could be strengthened",
-                "Specific metrics for project impact are somewhat limited"
-            ],
-            'recommendations': advice,
-            'interview_questions': [
-                "Can you describe a challenging technical problem you solved recently?",
-                "How do you approach learning new technologies in a fast-paced environment?",
-                "Describe your experience working in multidisciplinary teams."
-            ]
-        }
-
     current_api_key = os.getenv("GEMINI_API_KEY")
     if not current_api_key or "your_gemini_api_key_here" in current_api_key or current_api_key == "":
-        print("INFO: Entering Professional Demo Mode.")
-        return get_mock_analysis(is_error=False)
+        raise ValueError("GEMINI_API_KEY not found. Please set a valid API key in your .env file.")
+
+    genai.configure(api_key=current_api_key)
 
     # Re-configure if key was added after startup
     genai.configure(api_key=current_api_key)
@@ -258,19 +143,5 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
         result = json.loads(result_text)
         return result
     except Exception as e:
-        print(f"Error calling Gemini: {e}. Falling back to Demo Mode.")
-        # If API call fails (e.g. quota, invalid key), use mock data instead of 0%
-        import random
-        tech = random.randint(60, 85)
-        return {
-            'filename': filename,
-            'job_title': job_title,
-            'summary': f"AI SERVICE UNAVAILABLE: Candidate appears to be a reasonable fit. Note: Detailed AI analysis failed ({str(e)}), results shown are estimated.",
-            'score': tech - 5,
-            'key_metrics': {'technical_match': tech, 'experience_match': tech - 10, 'formatting_score': 85},
-            'skills_analysis': {'matched_technical_skills': ["Skill A", "Skill B"], 'missing_critical_skills': ["Skill C"], 'soft_skills_detected': ["Adaptability"]},
-            'strengths': ["Strong resume structure"],
-            'weaknesses': ["Potential skill gaps"],
-            'recommendations': ["Verify skills through technical interview", "Check API Key limit"],
-            'interview_questions': ["Describe your experience with software development."]
-        }
+        print(f"Error calling Gemini: {e}")
+        raise e
