@@ -148,6 +148,12 @@ def upload_resume():
                     tech_score = metrics.get('technical_match', 0)
                     exp_score = metrics.get('experience_match', 0)
                     fmt_score = metrics.get('formatting_score', 0)
+                    adv_score = metrics.get('advanced_source_match', 0)
+                    
+                    # Persist Advanced Score in Strengths for now (no DB schema change)
+                    strengths_list = analysis.get('strengths', [])
+                    if adv_score > 0:
+                        strengths_list.insert(0, f"Advanced Source Match: {adv_score}%")
                     
                     # Store analysis result in database
                     analysis_result = AnalysisResult(
@@ -158,7 +164,7 @@ def upload_resume():
                         formatting_score=fmt_score,
                         overall_score=overall_score,
                         summary=analysis.get('summary'),
-                        strengths=json.dumps(analysis.get('strengths', [])),
+                        strengths=json.dumps(strengths_list),
                         weaknesses=json.dumps(analysis.get('weaknesses', [])),
                         recommendations=json.dumps(analysis.get('recommendations', [])),
                         matched_skills=json.dumps(skills_analysis.get('matched_technical_skills', [])),
