@@ -153,4 +153,3 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     except Exception as e:
         print(f"Error calling Gemini: {e}")
         raise e
-```

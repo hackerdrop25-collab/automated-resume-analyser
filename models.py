@@ -123,6 +123,12 @@ class AnalysisResult(db.Model):
     
     def get_relevant_projects(self):
         return json.loads(self.relevant_projects) if self.relevant_projects else []
+
+    def get_education(self):
+        return json.loads(self.education) if self.education else []
+
+    def get_full_experience(self):
+        return json.loads(self.full_experience) if self.full_experience else []
     
     def __repr__(self):
         return f'<AnalysisResult {self.id} - Score: {self.overall_score}>'
