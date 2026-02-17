@@ -93,6 +93,10 @@ class AnalysisResult(db.Model):
     missing_skills = db.Column(db.Text, nullable=True)
     soft_skills = db.Column(db.Text, nullable=True)
     relevant_projects = db.Column(db.Text, nullable=True)
+    education = db.Column(db.Text, nullable=True)
+    full_experience = db.Column(db.Text, nullable=True)
+    candidate_name = db.Column(db.String(255), nullable=True)
+    candidate_email = db.Column(db.String(255), nullable=True)
     filtered_project_count = db.Column(db.Integer, default=0)
     total_project_count = db.Column(db.Integer, default=0)
     

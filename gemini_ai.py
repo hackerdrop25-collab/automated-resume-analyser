@@ -107,6 +107,13 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             "advanced_source_match": (0-100, inferred from links/depth),
             "soft_skills_score": (0-100, based on detected soft skills depth)
         }},
+        "resume_data": {{
+            "name": "Candidate Name (if found)",
+            "email": "Candidate Email (if found)",
+            "education": ["list of education entries"],
+            "full_experience": ["list of recent job roles and key responsibilities"],
+            "certifications_found": ["list of certifications found in resume"]
+        }},
         "skills_analysis": {{
             "matched_technical_skills": ["list", "of", "skills"],
             "missing_critical_skills": ["list", "of", "missing"],
@@ -142,7 +149,8 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
                 result_text = result_text[4:].strip()
         
         result = json.loads(result_text)
-        return result
+        return result, resume_text
     except Exception as e:
         print(f"Error calling Gemini: {e}")
         raise e
+```
