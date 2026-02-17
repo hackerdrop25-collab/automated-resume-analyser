@@ -546,6 +546,45 @@
                     </div>
                 </div>
 
+                <div class="section">
+                    <h3 class="section-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24" style="color: var(--primary);">
+                            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                        </svg>
+                        Matching Projects ({{ data.analysis.filtered_project_count|default(0) }}/{{
+                        data.analysis.total_project_count|default(0) }})
+                    </h3>
+                    <div style="display: grid; gap: 1.5rem;">
+                        {% for project in data.analysis.relevant_projects %}
+                        <div class="project-card">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <h4 style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">{{ project.project_name
+                                    }}</h4>
+                                <div class="{% if project.relevance_score >= 90 %}score-gradient-high{% elif project.relevance_score >= 75 %}score-gradient-med{% else %}score-gradient-low{% endif %}"
+                                    style="padding: 0.4rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: #020617;">
+                                    {{ project.relevance_score }}% Match
+                                </div>
+                            </div>
+                            <p style="color: #cbd5e1; line-height: 1.6; margin-bottom: 1rem;">{{ project.description }}
+                            </p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                                {% for tech in project.technologies %}
+                                <span
+                                    style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); color: var(--primary); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem;">{{
+                                    tech }}</span>
+                                {% endfor %}
+                            </div>
+                            <div
+                                style="background: rgba(0, 242, 254, 0.05); border-left: 2px solid var(--primary); padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #e2e8f0;">
+                                {{ project.role_match_reason }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <div class="list-container">
                     <div class="section">
                         <h3 class="section-title" style="color: #4ade80;">Core Strengths</h3>
