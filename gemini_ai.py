@@ -104,7 +104,8 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             "technical_match": (0-100),
             "experience_match": (0-100),
             "formatting_score": (0-100),
-            "advanced_source_match": (0-100, inferred from links/depth)
+            "advanced_source_match": (0-100, inferred from links/depth),
+            "soft_skills_score": (0-100, based on detected soft skills depth)
         }},
         "skills_analysis": {{
             "matched_technical_skills": ["list", "of", "skills"],

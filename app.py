@@ -133,6 +133,7 @@ def upload_resume():
                     exp_score = metrics.get('experience_match', 0)
                     fmt_score = metrics.get('formatting_score', 0)
                     adv_score = metrics.get('advanced_source_match', 0)
+                    soft_score = metrics.get('soft_skills_score', 0)
                     
                     strengths_list = analysis.get('strengths', [])
                     if adv_score > 0:
@@ -145,6 +146,7 @@ def upload_resume():
                         experience_score=exp_score,
                         formatting_score=fmt_score,
                         advanced_score=adv_score,
+                        soft_skills_score=soft_score,
                         overall_score=overall_score,
                         summary=analysis.get('summary'),
                         strengths=json.dumps(strengths_list),
@@ -164,6 +166,7 @@ def upload_resume():
                         'experience_score': exp_score,
                         'formatting_score': fmt_score,
                         'advanced_match': adv_score,
+                        'soft_skills_score': soft_score,
                         'summary': analysis.get('summary'),
                         'strengths': strengths_list,
                         'weaknesses': analysis.get('weaknesses', []),
@@ -246,6 +249,7 @@ def view_latest_results():
             'experience_score': result.experience_score or 0,
             'formatting_score': result.formatting_score or 0,
             'advanced_match': result.advanced_score or 0,
+            'soft_skills_score': result.soft_skills_score or 0,
             'summary': result.summary,
             'strengths': result.get_strengths(),
             'weaknesses': result.get_weaknesses(),
@@ -276,6 +280,7 @@ def view_specific_result(resume_id):
         'experience_score': result.experience_score or 0,
         'formatting_score': result.formatting_score or 0,
         'advanced_match': result.advanced_score or 0,
+        'soft_skills_score': result.soft_skills_score or 0,
         'summary': result.summary,
         'strengths': result.get_strengths(),
         'weaknesses': result.get_weaknesses(),
@@ -310,6 +315,7 @@ def get_analysis_data(analysis_id):
         'experience_score': analysis.experience_score,
         'formatting_score': analysis.formatting_score,
         'advanced_match': analysis.advanced_score,
+        'soft_skills_score': analysis.soft_skills_score,
         'summary': analysis.summary,
         'strengths': analysis.get_strengths(),
         'weaknesses': analysis.get_weaknesses(),

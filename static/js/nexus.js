@@ -1,5 +1,5 @@
 /**
- * SafeVote Ultra-Premium Background Animation
+ * Resume Analysis Pro Ultra-Premium Background Animation
  * "The Nexus Flow" - Dynamic Geometric Web & Ethereal Orbs
  */
 
