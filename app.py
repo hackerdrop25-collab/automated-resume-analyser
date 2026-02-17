@@ -154,6 +154,7 @@ def upload_resume():
                         recommendations=json.dumps(analysis.get('recommendations', [])),
                         matched_skills=json.dumps(skills_analysis.get('matched_technical_skills', [])),
                         missing_skills=json.dumps(skills_analysis.get('missing_critical_skills', [])),
+                        soft_skills=json.dumps(skills_analysis.get('soft_skills_detected', [])),
                         relevant_projects=json.dumps(analysis.get('relevant_projects', [])),
                         filtered_project_count=analysis.get('filtered_project_count', 0),
                         total_project_count=analysis.get('total_project_count', 0)
@@ -173,6 +174,7 @@ def upload_resume():
                         'recommendations': analysis.get('recommendations', []),
                         'matched_skills': skills_analysis.get('matched_technical_skills', []),
                         'missing_skills': skills_analysis.get('missing_critical_skills', []),
+                        'soft_skills': skills_analysis.get('soft_skills_detected', []),
                         'relevant_projects': analysis.get('relevant_projects', []),
                         'filtered_project_count': analysis.get('filtered_project_count', 0),
                         'total_project_count': analysis.get('total_project_count', 0)
@@ -256,6 +258,7 @@ def view_latest_results():
             'recommendations': result.get_recommendations(),
             'matched_skills': result.get_matched_skills(),
             'missing_skills': result.get_missing_skills(),
+            'soft_skills': result.get_soft_skills(),
             'relevant_projects': result.get_relevant_projects(),
             'filtered_project_count': result.filtered_project_count,
             'total_project_count': result.total_project_count
@@ -287,6 +290,7 @@ def view_specific_result(resume_id):
         'recommendations': result.get_recommendations(),
         'matched_skills': result.get_matched_skills(),
         'missing_skills': result.get_missing_skills(),
+        'soft_skills': result.get_soft_skills(),
         'relevant_projects': result.get_relevant_projects(),
         'filtered_project_count': result.filtered_project_count,
         'total_project_count': result.total_project_count
@@ -322,6 +326,7 @@ def get_analysis_data(analysis_id):
         'recommendations': analysis.get_recommendations(),
         'matched_skills': analysis.get_matched_skills(),
         'missing_skills': analysis.get_missing_skills(),
+        'soft_skills': analysis.get_soft_skills(),
         'resume': {
             'original_filename': analysis.resume.original_filename,
             'uploaded_at': analysis.resume.uploaded_at.isoformat()

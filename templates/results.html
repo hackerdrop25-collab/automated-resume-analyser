@@ -351,7 +351,8 @@
                         <h3 class="section-title" style="font-size: 1rem; text-align: center;">Match Analysis</h3>
                         <canvas id="chart-{{ loop.index }}" data-technical="{{ analysis.key_metrics.technical_match }}"
                             data-experience="{{ analysis.key_metrics.experience_match }}"
-                            data-formatting="{{ analysis.key_metrics.formatting_score }}">
+                            data-formatting="{{ analysis.key_metrics.formatting_score }}"
+                            data-soft="{{ analysis.key_metrics.soft_skills_score|default(85) }}">
                         </canvas>
                     </div>
 
@@ -381,7 +382,7 @@
                                 parseFloat(canvas.dataset.technical) || 0,
                                 parseFloat(canvas.dataset.experience) || 0,
                                 parseFloat(canvas.dataset.formatting) || 0,
-                                85 // Soft skills estimated
+                                parseFloat(canvas.dataset.soft) || 85 // Use real score or fallback
                             ],
                             backgroundColor: 'rgba(0, 210, 255, 0.2)',
                             borderColor: 'rgba(0, 210, 255, 1)',

@@ -592,6 +592,22 @@
                 </div>
 
                 <div class="section">
+                    <h3 class="section-title" style="color: #a855f7;">Detected Soft Skills</h3>
+                    <div class="pill-list">
+                        {% if data.analysis.soft_skills is string %}
+                        {% set soft_skills = data.analysis.soft_skills|from_json %}
+                        {% else %}
+                        {% set soft_skills = data.analysis.soft_skills %}
+                        {% endif %}
+
+                        {% for skill in soft_skills %}
+                        <div class="pill" style="color: #d8b4fe; border-color: rgba(168, 85, 247, 0.2);">{{ skill }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="section">
                     <h3 class="section-title">Strategic Recommendations</h3>
                     <ul style="list-style: none; color: #cbd5e1;">
                         {% if data.analysis.recommendations is string %}
