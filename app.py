@@ -122,11 +122,15 @@ def upload_resume():
                     db.session.flush()
                     
                     log_security_event('ANALYSIS_START', f"Starting AI analysis for resume: {original_filename}")
-                    analysis = analyze_resume(filepath, job_title, experience, certifications, project_description)
+                    analysis, extracted_text = analyze_resume(filepath, job_title, experience, certifications, project_description)
                     log_security_event('ANALYSIS_COMPLETE', f"Successfully analyzed resume: {original_filename}")
+                    
+                    resume.extracted_text = extracted_text
+                    db.session.add(resume)
                     
                     metrics = analysis.get('key_metrics', {})
                     skills_analysis = analysis.get('skills_analysis', {})
+                    resume_data = analysis.get('resume_data', {})
                     
                     overall_score = analysis.get('score', 0)
                     tech_score = metrics.get('technical_match', 0)
@@ -156,6 +160,10 @@ def upload_resume():
                         missing_skills=json.dumps(skills_analysis.get('missing_critical_skills', [])),
                         soft_skills=json.dumps(skills_analysis.get('soft_skills_detected', [])),
                         relevant_projects=json.dumps(analysis.get('relevant_projects', [])),
+                        education=json.dumps(resume_data.get('education', [])),
+                        full_experience=json.dumps(resume_data.get('full_experience', [])),
+                        candidate_name=resume_data.get('name'),
+                        candidate_email=resume_data.get('email'),
                         filtered_project_count=analysis.get('filtered_project_count', 0),
                         total_project_count=analysis.get('total_project_count', 0)
                     )
@@ -176,6 +184,10 @@ def upload_resume():
                         'missing_skills': skills_analysis.get('missing_critical_skills', []),
                         'soft_skills': skills_analysis.get('soft_skills_detected', []),
                         'relevant_projects': analysis.get('relevant_projects', []),
+                        'education': resume_data.get('education', []),
+                        'full_experience': resume_data.get('full_experience', []),
+                        'candidate_name': resume_data.get('name'),
+                        'candidate_email': resume_data.get('email'),
                         'filtered_project_count': analysis.get('filtered_project_count', 0),
                         'total_project_count': analysis.get('total_project_count', 0)
                     }
@@ -260,6 +272,10 @@ def view_latest_results():
             'missing_skills': result.get_missing_skills(),
             'soft_skills': result.get_soft_skills(),
             'relevant_projects': result.get_relevant_projects(),
+            'education': result.get_education(),
+            'experience': result.get_full_experience(),
+            'candidate_name': result.candidate_name,
+            'candidate_email': result.candidate_email,
             'filtered_project_count': result.filtered_project_count,
             'total_project_count': result.total_project_count
         }
@@ -292,6 +308,10 @@ def view_specific_result(resume_id):
         'missing_skills': result.get_missing_skills(),
         'soft_skills': result.get_soft_skills(),
         'relevant_projects': result.get_relevant_projects(),
+        'education': result.get_education(),
+        'experience': result.get_full_experience(),
+        'candidate_name': result.candidate_name,
+        'candidate_email': result.candidate_email,
         'filtered_project_count': result.filtered_project_count,
         'total_project_count': result.total_project_count
     }
@@ -333,6 +353,19 @@ def get_analysis_data(analysis_id):
         },
         'analyzed_at': analysis.analyzed_at.isoformat()
     })
+
+@app.route('/history')
+@login_required
+def analysis_history():
+    page = request.args.get('page', 1, type=int)
+    analyses = AnalysisResult.query.filter_by(user_id=current_user.id).order_by(AnalysisResult.analyzed_at.desc()).paginate(page=page, per_page=9)
+    return render_template('analysis_history.html', analyses=analyses)
+
+@app.route('/analysis/<int:analysis_id>')
+@login_required
+def view_analysis(analysis_id):
+    analysis = AnalysisResult.query.filter_by(id=analysis_id, user_id=current_user.id).first_or_404()
+    return render_template('analysis_detail.html', analysis=analysis)
 
 @app.route('/admin/security')
 @login_required
