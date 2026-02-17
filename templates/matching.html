@@ -426,8 +426,20 @@
             {% for data in analyses %}
             <div class="analysis-panel {% if loop.first %}active{% endif %}" id="panel-{{ loop.index0 }}">
                 <div class="hero-section">
-                    <h1>{{ data.resume_filename }}</h1>
-                    <p style="color: var(--text-muted);">Detailed AI compatibility insights</p>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h1 id="panel-name-{{ loop.index0 }}">{{
+                                data.analysis.candidate_name|default(data.resume_filename) }}</h1>
+                            <p style="color: var(--primary); font-weight: 600;">{{
+                                data.analysis.candidate_email|default('No email found') }}</p>
+                            <p style="color: var(--text-muted); margin-top: 0.5rem;">Targeting: {{
+                                data.analysis.job_title|default('Not specified') }}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="color: var(--text-muted); font-size: 0.8rem;">Analyzed on {{
+                                data.analysis.analyzed_at|default('Recent') }}</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="stats-grid">
@@ -490,75 +502,49 @@
                     </div>
                 </div>
 
-                {% if data.analysis.relevant_projects %}
                 <div class="section">
                     <h3 class="section-title">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24" style="color: var(--primary);">
-                            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                            <path
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
                         </svg>
-                        Relevant Projects
+                        Professional Experience
                     </h3>
-                    <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
-                        Showing {{ data.analysis.filtered_project_count|default(0) }} out of {{
-                        data.analysis.total_project_count|default(0) }} projects that match the role requirements
-                    </p>
-
-                    <div style="display: grid; gap: 1.5rem;">
-                        {% for project in data.analysis.relevant_projects %}
-                        <div class="project-card">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <h4 style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">{{ project.project_name
-                                    }}</h4>
-                                <div class="{% if project.relevance_score >= 90 %}score-gradient-high{% elif project.relevance_score >= 75 %}score-gradient-med{% else %}score-gradient-low{% endif %}"
-                                    style="padding: 0.4rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: #020617;">
-                                    {{ project.relevance_score }}% Match
-                                </div>
-                            </div>
-
-                            <p style="color: #cbd5e1; line-height: 1.6; margin-bottom: 1rem;">{{ project.description }}
-                            </p>
-
-                            <div style="margin-bottom: 1rem;">
-                                <div
-                                    style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
-                                    Technologies</div>
-                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                                    {% for tech in project.technologies %}
-                                    <span
-                                        style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); color: var(--primary); padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;">{{
-                                        tech }}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <div
-                                style="background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--primary); padding: 0.75rem 1rem; border-radius: 4px;">
-                                <div
-                                    style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem;">
-                                    Why This Matches</div>
-                                <div style="color: #e2e8f0; font-size: 0.9rem;">{{ project.role_match_reason }}</div>
-                            </div>
+                    <div style="display: grid; gap: 1rem;">
+                        {% for exp in data.analysis.experience %}
+                        <div
+                            style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border);">
+                            <p style="color: #e2e8f0; line-height: 1.6;">{{ exp }}</p>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
-                {% else %}
+
                 <div class="section">
-                    <h3 class="section-title" style="color: #f59e0b;">
+                    <h3 class="section-title">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
+                            viewBox="0 0 24 24" style="color: var(--primary);">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
                             <path
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222">
                             </path>
                         </svg>
-                        No Matching Projects Found
+                        Education & Certifications
                     </h3>
-                    <p style="color: var(--text-muted);">No projects in this resume met the relevance threshold (>60%)
-                        for the {{ data.analysis.job_title }} role.</p>
+                    <div style="display: grid; gap: 1rem;">
+                        {% for edu in data.analysis.education %}
+                        <div
+                            style="background: rgba(0, 242, 254, 0.03); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--primary);">
+                            <p style="color: #cbd5e1;">{{ edu }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-                {% endif %}
 
                 <div class="list-container">
                     <div class="section">
