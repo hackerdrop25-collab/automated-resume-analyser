@@ -91,6 +91,7 @@ class AnalysisResult(db.Model):
     recommendations = db.Column(db.Text, nullable=True)
     matched_skills = db.Column(db.Text, nullable=True)
     missing_skills = db.Column(db.Text, nullable=True)
+    soft_skills = db.Column(db.Text, nullable=True)
     relevant_projects = db.Column(db.Text, nullable=True)
     filtered_project_count = db.Column(db.Integer, default=0)
     total_project_count = db.Column(db.Integer, default=0)
@@ -112,6 +113,9 @@ class AnalysisResult(db.Model):
     
     def get_missing_skills(self):
         return json.loads(self.missing_skills) if self.missing_skills else []
+    
+    def get_soft_skills(self):
+        return json.loads(self.soft_skills) if self.soft_skills else []
     
     def get_relevant_projects(self):
         return json.loads(self.relevant_projects) if self.relevant_projects else []
