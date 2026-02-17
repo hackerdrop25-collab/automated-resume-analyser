@@ -188,6 +188,7 @@ def upload_resume():
                         'full_experience': resume_data.get('full_experience', []),
                         'candidate_name': resume_data.get('name'),
                         'candidate_email': resume_data.get('email'),
+                        'extracted_text': extracted_text,
                         'filtered_project_count': analysis.get('filtered_project_count', 0),
                         'total_project_count': analysis.get('total_project_count', 0)
                     }
@@ -276,6 +277,7 @@ def view_latest_results():
             'experience': result.get_full_experience(),
             'candidate_name': result.candidate_name,
             'candidate_email': result.candidate_email,
+            'extracted_text': result.resume.extracted_text,
             'filtered_project_count': result.filtered_project_count,
             'total_project_count': result.total_project_count
         }
@@ -312,6 +314,7 @@ def view_specific_result(resume_id):
         'experience': result.get_full_experience(),
         'candidate_name': result.candidate_name,
         'candidate_email': result.candidate_email,
+        'extracted_text': result.resume.extracted_text,
         'filtered_project_count': result.filtered_project_count,
         'total_project_count': result.total_project_count
     }

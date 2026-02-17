@@ -112,9 +112,14 @@
     <div class="container">
         <nav>
             <div class="logo">Resume Analysis Pro</div>
-            <a href="/admin/security" class="btn"
-                style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1;">🛡️
-                Security Audit</a>
+            <div style="display: flex; gap: 1rem;">
+                <a href="/history" class="btn"
+                    style="background: rgba(0, 210, 255, 0.1); border: 1px solid var(--primary); color: var(--primary);">📜
+                    History</a>
+                <a href="/admin/security" class="btn"
+                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1;">🛡️
+                    Security Audit</a>
+            </div>
         </nav>
 
         {% if not api_status %}
