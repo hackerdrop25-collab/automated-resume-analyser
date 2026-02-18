@@ -228,7 +228,7 @@
 </head>
 
 <body>
-    <script src="{{ url_for('static', filename='js/nexus.js') }}"></script>
+
 
     <div id="loading" class="loading-overlay">
         <div class="spinner"></div>
@@ -282,10 +282,9 @@
 
             <div id="file-inputs" style="margin-top: 1.5rem;">
                 <!-- Inputs generated here -->
-                <div class="drop-zone" onclick="document.getElementById('file-1').click()">
-                    <p style="color: #64748b; font-weight: 500;">Click or Drag Resume 1 (PDF/DOCX)</p>
-                    <input type="file" id="file-1" name="resume_1" accept=".pdf,.docx" style="display: none;" required
-                        onchange="updateLabel(1)">
+                <div class="drop-zone">
+                    <p style="color: #64748b; font-weight: 500;">Select Resume (PDF/DOCX)</p>
+                    <input type="file" id="file-1" name="resume_1" accept=".pdf,.docx" required>
                     <p id="label-1"
                         style="color: var(--primary); margin-top: 0.75rem; font-weight: 700; font-size: 0.875rem;">
                     </p>
@@ -302,52 +301,7 @@
         </form>
     </div>
 
-    <script>
-        function generateInputs() {
-            const num = document.getElementById('num_resumes').value;
-            const container = document.getElementById('file-inputs');
-            container.innerHTML = '';
-            for (let i = 1; i <= num; i++) {
-                const zone = document.createElement('div');
-                zone.className = 'drop-zone';
-                zone.onclick = () => document.getElementById(`file-${i}`).click();
-                zone.innerHTML = `
-                <p style="color: #94a3b8;">Click or Drag Resume ${i} (PDF/DOCX)</p>
-                <input type="file" id="file-${i}" name="resume_${i}" accept=".pdf,.docx" style="display: none;" required onchange="updateLabel(${i})">
-                <p id="label-${i}" style="color: var(--primary); margin-top: 0.5rem; font-weight: 600; font-size: 0.85rem;"></p>
-            `;
-                container.appendChild(zone);
-            }
-        }
 
-        function updateLabel(id) {
-            const input = document.getElementById(`file-${id}`);
-            const label = document.getElementById(`label-${id}`);
-            if (input.files && input.files[0]) {
-                label.innerText = "Selected: " + input.files[0].name;
-            }
-        }
-
-        document.getElementById('analysis-form').onsubmit = function () {
-            document.getElementById('loading').style.display = 'flex';
-
-            const messages = [
-                "Extracting text from resumes...",
-                "Analyzing technical skills...",
-                "Matching experience requirements...",
-                "Checking certification validity...",
-                "Formatting results for your dashboard...",
-                "Almost there! Finalizing AI insights..."
-            ];
-
-            let i = 0;
-            const textElement = document.querySelector('.progress-text');
-            setInterval(() => {
-                textElement.innerText = messages[i % messages.length];
-                i++;
-            }, 3000);
-        };
-    </script>
 </body>
 
 </html>
