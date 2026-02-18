@@ -143,10 +143,11 @@
             padding: 3rem;
             max-width: 1000px;
             margin: 0 auto;
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+            opacity: 1;
+            transform: none;
+            border-bottom: 2px solid var(--glass-border);
+            margin-bottom: 4rem;
         }
 
         .analysis-panel.active {
@@ -492,10 +493,6 @@
                         <div style="text-align: right;">
                             <p style="color: var(--text-muted); font-size: 0.8rem;">Analyzed on {{
                                 data.analysis.analyzed_at|default('Recent') }}</p>
-                            <button onclick="openModal('{{ loop.index0 }}')" class="btn-back"
-                                style="margin-top: 1rem; border-color: var(--primary); color: var(--primary); font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                View Raw Text
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -554,14 +551,9 @@
                             </svg>
                             Real-World Capability Map
                         </h3>
-                        <div style="height: 320px; width: 100%;">
-                            <canvas id="chart-{{ loop.index0 }}"
-                                data-technical="{{ data.analysis.technical_score|default(0) }}"
-                                data-experience="{{ data.analysis.experience_score|default(0) }}"
-                                data-formatting="{{ data.analysis.formatting_score|default(0) }}"
-                                data-advanced="{{ data.analysis.advanced_match|default(0) }}"
-                                data-soft="{{ data.analysis.soft_skills_score|default(0) }}">
-                            </canvas>
+                        <div
+                            style="height: 100px; width: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); border: 1px dashed var(--glass-border); border-radius: 12px;">
+                            Visualization Disabled (JavaScript Removed)
                         </div>
                     </div>
                     <div class="section" style="margin-bottom: 0;">
@@ -729,123 +721,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const resumeItems = document.querySelectorAll('.resume-item');
 
-            resumeItems.forEach(item => {
-                item.addEventListener('click', function () {
-                    const index = this.getAttribute('data-index');
-                    showAnalysis(index, this);
-                });
-            });
-
-            // Initialize correct display states for panels
-            document.querySelectorAll('.analysis-panel').forEach(panel => {
-                if (panel.classList.contains('active')) {
-                    panel.style.display = 'block';
-                    initChart(panel.id.split('-')[1]);
-                } else {
-                    panel.style.display = 'none';
-                }
-            });
-        });
-
-        const charts = {};
-
-        function initChart(index) {
-            if (charts[index]) return;
-
-            const canvas = document.getElementById(`chart-${index}`);
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            const data = {
-                technical: parseFloat(canvas.dataset.technical) || 0,
-                experience: parseFloat(canvas.dataset.experience) || 0,
-                formatting: parseFloat(canvas.dataset.formatting) || 0,
-                advanced: parseFloat(canvas.dataset.advanced) || 0,
-                soft: parseFloat(canvas.dataset.soft) || 0
-            };
-
-            charts[index] = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Technical', 'Experience', 'ATS Format', 'Advanced', 'Soft Skills'],
-                    datasets: [{
-                        label: 'Metric Score',
-                        data: [data.technical, data.experience, data.formatting, data.advanced, data.soft],
-                        backgroundColor: 'rgba(0, 242, 254, 0.2)',
-                        borderColor: 'rgba(0, 242, 254, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(0, 242, 254, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(0, 242, 254, 1)'
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            pointLabels: { color: '#94a3b8', font: { size: 11, family: 'Outfit' } },
-                            ticks: { display: false, stepSize: 20 },
-                            suggestedMin: 0,
-                            suggestedMax: 100
-                        }
-                    },
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false
-                }
-            });
-        }
-
-        function showAnalysis(index, element) {
-            // Update sidebar UI
-            document.querySelectorAll('.resume-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            // Update panels
-            const panels = document.querySelectorAll('.analysis-panel');
-            const targetPanel = document.getElementById(`panel-${index}`);
-
-            panels.forEach(p => {
-                p.classList.remove('active');
-                p.style.display = 'none';
-            });
-
-            targetPanel.style.display = 'block';
-            // Trigger reflow
-            targetPanel.offsetHeight;
-            targetPanel.classList.add('active');
-
-            // Initialize chart for this panel
-            initChart(index);
-
-            // Update sticky header filename
-            const nameEl = element.querySelector('.name');
-            if (nameEl) {
-                const filename = nameEl.textContent;
-                document.getElementById('active-filename').textContent = filename;
-            }
-
-            // Smooth scroll main content to top
-            const mainContent = document.querySelector('.main-content');
-            if (mainContent) {
-                mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        function openModal(index) {
-            document.getElementById(`modal-${index}`).style.display = 'flex';
-        }
-
-        function closeModal(index) {
-            document.getElementById(`modal-${index}`).style.display = 'none';
-        }
-    </script>
 </body>
 
 </html>
