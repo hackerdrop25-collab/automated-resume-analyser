@@ -786,8 +786,7 @@
 
         // Initialize Radar Charts
         {% for data in analyses %}
-        const ctx{{ loop.index0 }
-    } = document.getElementById('radar-{{ loop.index0 }}').getContext('2d');
+        const ctx{{ loop.index0 }} = document.getElementById('radar-{{ loop.index0 }}').getContext('2d');
     new Chart(ctx{{ loop.index0 }}, {
         type: 'radar',
         data: {
