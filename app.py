@@ -164,6 +164,8 @@ def upload_resume():
                         full_experience=json.dumps(resume_data.get('full_experience', [])),
                         candidate_name=resume_data.get('name'),
                         candidate_email=resume_data.get('email'),
+                        career_trajectory=analysis.get('career_trajectory'),
+                        red_flags=json.dumps(analysis.get('red_flags', [])),
                         filtered_project_count=analysis.get('filtered_project_count', 0),
                         total_project_count=analysis.get('total_project_count', 0)
                     )
@@ -177,6 +179,8 @@ def upload_resume():
                         'advanced_match': adv_score,
                         'soft_skills_score': soft_score,
                         'summary': analysis.get('summary'),
+                        'career_trajectory': analysis.get('career_trajectory'),
+                        'red_flags': analysis.get('red_flags', []),
                         'strengths': strengths_list,
                         'weaknesses': analysis.get('weaknesses', []),
                         'recommendations': analysis.get('recommendations', []),
@@ -277,6 +281,8 @@ def view_latest_results():
             'experience': result.get_full_experience(),
             'candidate_name': result.candidate_name,
             'candidate_email': result.candidate_email,
+            'career_trajectory': result.career_trajectory,
+            'red_flags': result.get_red_flags(),
             'extracted_text': result.resume.extracted_text,
             'filtered_project_count': result.filtered_project_count,
             'total_project_count': result.total_project_count
@@ -314,6 +320,8 @@ def view_specific_result(resume_id):
         'experience': result.get_full_experience(),
         'candidate_name': result.candidate_name,
         'candidate_email': result.candidate_email,
+        'career_trajectory': result.career_trajectory,
+        'red_flags': result.get_red_flags(),
         'extracted_text': result.resume.extracted_text,
         'filtered_project_count': result.filtered_project_count,
         'total_project_count': result.total_project_count
