@@ -502,7 +502,8 @@
                 <div class="hero-section">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h1 id="panel-name-{{ loop.index0 }}">{{
+                            <h1 id="panel-name-{{ loop.index0 }}" class="candidate-name" data-index="{{ loop.index0 }}"
+                                style="cursor: pointer;">{{
                                 data.analysis.candidate_name|default(data.resume_filename) }}</h1>
                             <p style="color: var(--primary); font-weight: 600;">{{
                                 data.analysis.candidate_email|default('No email found') }}</p>
@@ -570,7 +571,8 @@
                             </svg>
                             Real-World Capability Map
                         </h3>
-                        <canvas id="radar-{{ loop.index0 }}"></canvas>
+                        <canvas id="radar-{{ loop.index0 }}" class="radar-chart"
+                            data-scores='[{{ data.analysis.technical_score|default(0) }}, {{ data.analysis.experience_score|default(0) }}, {{ data.analysis.formatting_score|default(0) }}, {{ data.analysis.advanced_match|default(0) }}, {{ data.analysis.soft_skills_score|default(0) }}]'></canvas>
                     </div>
                     <div class="section" style="margin-bottom: 0;">
                         <h3 class="section-title">Executive Summary</h3>
@@ -785,54 +787,50 @@
         });
 
         // Initialize Radar Charts
-        {% for data in analyses %}
-        const ctx{{ loop.index0 }} = document.getElementById('radar-{{ loop.index0 }}').getContext('2d');
-    new Chart(ctx{{ loop.index0 }}, {
-        type: 'radar',
-        data: {
-            labels: ['Technical', 'Experience', 'Formatting', 'Advanced Verification', 'Soft Skills'],
-            datasets: [{
-                label: 'Match Score',
-                data: [
-                    {{ data.analysis.technical_score |default(0) }},
-            {{ data.analysis.experience_score |default(0) }},
-                        {{ data.analysis.formatting_score |default(0) }},
-        {{ data.analysis.advanced_match |default(0) }},
-        {{ data.analysis.soft_skills_score |default(0) }}
-                    ],
-        backgroundColor: 'rgba(0, 242, 254, 0.2)',
-        borderColor: '#00f2fe',
-        borderWidth: 2,
-        pointBackgroundColor: '#00f2fe'
-                }]
-            },
-        options: {
-        scales: {
-            r: {
-                beginAtZero: true,
-                max: 100,
-                grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } },
-                ticks: { display: false }
-            }
-        },
-        plugins: { legend: { display: false } }
-    }
+        document.querySelectorAll('.radar-chart').forEach(canvas => {
+            const scores = JSON.parse(canvas.getAttribute('data-scores'));
+            new Chart(canvas.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: ['Technical', 'Experience', 'Formatting', 'Advanced Verification', 'Soft Skills'],
+                    datasets: [{
+                        label: 'Match Score',
+                        data: scores,
+                        backgroundColor: 'rgba(0, 242, 254, 0.2)',
+                        borderColor: '#00f2fe',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#00f2fe'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
         });
-    {% endfor %}
+
+        // Show raw text when clicking on name
+        document.querySelectorAll('.candidate-name').forEach(element => {
+            element.addEventListener('click', () => {
+                const index = element.getAttribute('data-index');
+                const modal = document.getElementById(`modal-${index}`);
+                if (modal) modal.style.display = 'flex';
+            });
+        });
     });
 
     function closeModal(index) {
         document.getElementById(`modal-${index}`).style.display = 'none';
     }
-
-    // Show raw text when clicking on name
-    {% for data in analyses %}
-    document.getElementById('panel-name-{{ loop.index0 }}').addEventListener('click', () => {
-        document.getElementById('modal-{{ loop.index0 }}').style.display = 'flex';
-    });
-    {% endfor %}
 </script>
 
 </html>
