@@ -763,4 +763,77 @@
 
 </body>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Sidebar Navigation
+        const items = document.querySelectorAll('.resume-item');
+        const panels = document.querySelectorAll('.analysis-panel');
+        const activeFilename = document.getElementById('active-filename');
+
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const index = item.getAttribute('data-index');
+
+                items.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                panels.forEach(p => p.classList.remove('active'));
+                document.getElementById(`panel-${index}`).classList.add('active');
+
+                activeFilename.textContent = item.querySelector('.name').textContent;
+            });
+        });
+
+        // Initialize Radar Charts
+        {% for data in analyses %}
+        const ctx{{ loop.index0 }
+    } = document.getElementById('radar-{{ loop.index0 }}').getContext('2d');
+    new Chart(ctx{{ loop.index0 }}, {
+        type: 'radar',
+        data: {
+            labels: ['Technical', 'Experience', 'Formatting', 'Advanced Verification', 'Soft Skills'],
+            datasets: [{
+                label: 'Match Score',
+                data: [
+                    {{ data.analysis.technical_score |default(0) }},
+            {{ data.analysis.experience_score |default(0) }},
+                        {{ data.analysis.formatting_score |default(0) }},
+        {{ data.analysis.advanced_match |default(0) }},
+        {{ data.analysis.soft_skills_score |default(0) }}
+                    ],
+        backgroundColor: 'rgba(0, 242, 254, 0.2)',
+        borderColor: '#00f2fe',
+        borderWidth: 2,
+        pointBackgroundColor: '#00f2fe'
+                }]
+            },
+        options: {
+        scales: {
+            r: {
+                beginAtZero: true,
+                max: 100,
+                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                pointLabels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } },
+                ticks: { display: false }
+            }
+        },
+        plugins: { legend: { display: false } }
+    }
+        });
+    {% endfor %}
+    });
+
+    function closeModal(index) {
+        document.getElementById(`modal-${index}`).style.display = 'none';
+    }
+
+    // Show raw text when clicking on name
+    {% for data in analyses %}
+    document.getElementById('panel-name-{{ loop.index0 }}').addEventListener('click', () => {
+        document.getElementById('modal-{{ loop.index0 }}').style.display = 'flex';
+    });
+    {% endfor %}
+</script>
+
 </html>
