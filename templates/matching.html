@@ -439,7 +439,26 @@
         .close-modal:hover {
             color: white;
         }
+
+        .red-flag-item {
+            background: rgba(239, 68, 68, 0.05);
+            border-left: 3px solid #ef4444;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #fca5a5;
+        }
+
+        .trajectory-card {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.05), rgba(79, 172, 254, 0.05));
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -551,15 +570,24 @@
                             </svg>
                             Real-World Capability Map
                         </h3>
-                        <div
-                            style="height: 100px; width: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); border: 1px dashed var(--glass-border); border-radius: 12px;">
-                            Visualization Disabled (JavaScript Removed)
-                        </div>
+                        <canvas id="radar-{{ loop.index0 }}"></canvas>
                     </div>
                     <div class="section" style="margin-bottom: 0;">
                         <h3 class="section-title">Executive Summary</h3>
                         <p class="summary-text" style="font-size: 0.95rem;">{{ data.analysis.summary }}</p>
                     </div>
+                </div>
+
+                <div class="trajectory-card">
+                    <h3 class="section-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        Career Trajectory & Potential
+                    </h3>
+                    <p style="color: #e2e8f0; line-height: 1.6; font-style: italic;">"{{
+                        data.analysis.career_trajectory|default('Insufficient data for projection.') }}"</p>
                 </div>
 
                 <div class="section">
@@ -662,7 +690,7 @@
                     </div>
                     <div class="section">
                         <h3 class="section-title" style="color: #f87171;">Optimization Items</h3>
-                        <div class="pill-list">
+                        <div class="pill-list" style="margin-bottom: 1.5rem;">
                             {% if data.analysis.weaknesses is string %}
                             {% set weaknesses = data.analysis.weaknesses|from_json %}
                             {% else %}
@@ -673,6 +701,17 @@
                             <div class="pill pill-red">{{ weakness }}</div>
                             {% endfor %}
                         </div>
+
+                        {% if data.analysis.red_flags %}
+                        <h4
+                            style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #f87171; text-transform: uppercase; letter-spacing: 1px;">
+                            Red Flags</h4>
+                        <div class="red-flag-list">
+                            {% for flag in data.analysis.red_flags %}
+                            <div class="red-flag-item">{{ flag }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
