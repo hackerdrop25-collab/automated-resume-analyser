@@ -128,6 +128,8 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
                 "role_match_reason": "Why this project is relevant to {job_title}"
             }}
         ],
+        "career_trajectory": "1-2 sentence prediction of the candidate's future growth and potential roles.",
+        "red_flags": ["list of potential concerns, e.g. frequent job hopping, gaps without explanation, skill mismatch"],
         "filtered_project_count": (number of relevant projects included),
         "total_project_count": (total number of projects found in resume),
         "strengths": ["point 1", "point 2"],
