@@ -95,38 +95,38 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     Only include projects that directly relate to the job requirements.
     
     Provide the output in STRICT JSON format:
-    {
+    {{
         "filename": "{filename}",
         "job_title": "{job_title}",
         "summary": "3-4 sentence professional summary of fit, including a note on 'Advanced Source Verification' (e.g. 'GitHub profile indicates strong open source contribution...').",
         "score": (0-100 overall score),
-        "key_metrics": {
+        "key_metrics": {{
             "technical_match": (0-100),
             "experience_match": (0-100),
             "formatting_score": (0-100),
             "advanced_source_match": (0-100, inferred from links/depth),
             "soft_skills_score": (0-100, based on detected soft skills depth)
-        },
-        "resume_data": {
+        }},
+        "resume_data": {{
             "name": "Candidate Name (if found)",
             "email": "Candidate Email (if found)",
             "education": ["list of education entries"],
             "full_experience": ["list of recent job roles and key responsibilities"],
             "certifications_found": ["list of certifications found in resume"]
-        },
-        "skills_analysis": {
+        }},
+        "skills_analysis": {{
             "matched_technical_skills": ["list", "of", "skills"],
             "missing_critical_skills": ["list", "of", "missing"],
             "soft_skills_detected": ["list", "of", "soft", "skills"]
-        },
+        }},
         "relevant_projects": [
-            {
+            {{
                 "project_name": "Name of the project",
                 "relevance_score": (0-100, only include if > 60),
                 "description": "Brief description of what the project does",
                 "technologies": ["tech1", "tech2"],
                 "role_match_reason": "Why this project is relevant to {job_title}"
-            }
+            }}
         ],
         "career_trajectory": "1-2 sentence prediction of the candidate's future growth and potential roles.",
         "red_flags": ["list of potential concerns, e.g. frequent job hopping, gaps without explanation, skill mismatch"],
@@ -136,13 +136,13 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
         "weaknesses": ["area 1", "area 2"],
         "recommendations": ["advice 1", "advice 2"],
         "interview_questions": [
-            {
+            {{
                 "question": "Strategic technical or behavioral question based on this specific resume's content",
                 "sample_solution": "The 'Sample Solution' (perfect answer) the recruiter should look for",
                 "logic": "The reasoning behind asking this specific question for this role"
-            }
+            }}
         ]
-    }
+    }}
     """
 
     try:
