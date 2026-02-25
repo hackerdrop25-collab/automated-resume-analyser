@@ -708,11 +708,18 @@
                             </svg>
                             Targeted Profile Summary (Optimized)
                         </h4>
-                        <p style="color: #ffffff; line-height: 1.7; font-size: 1rem; font-style: italic;">"{{
-                            data.analysis.skill_gap_diff.optimized_summary }}"</p>
-                        <p
-                            style="color: var(--primary); font-size: 0.75rem; margin-top: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                            Copy this to your resume to instantly improve match</p>
+                        <p style="color: #ffffff; line-height: 1.7; font-size: 1rem; font-style: italic;"
+                            id="opt-summary-{{ loop.index0 }}">"{{ data.analysis.skill_gap_diff.optimized_summary }}"
+                        </p>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                            <p
+                                style="color: var(--primary); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                                Copy this to your resume to instantly improve match</p>
+                            <button onclick="copySummary('{{ loop.index0 }}')"
+                                style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">Copy
+                                Text</button>
+                        </div>
                     </div>
                     {% endif %}
                     {% endif %}
@@ -896,6 +903,24 @@
     </div>
 
 
+    <script>
+        function copySummary(index) {
+            const textElement = document.getElementById('opt-summary-' + index);
+            const text = textElement.innerText.replace(/^"|"$/g, '');
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = 'var(--primary)';
+                btn.style.color = '#020617';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255,255,255,0.1)';
+                    btn.style.color = 'white';
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 
 <script>
