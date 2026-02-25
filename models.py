@@ -102,6 +102,7 @@ class AnalysisResult(db.Model):
     career_trajectory = db.Column(db.Text, nullable=True)
     red_flags = db.Column(db.Text, nullable=True)
     interview_questions = db.Column(db.Text, nullable=True)
+    skill_gap_diff = db.Column(db.Text, nullable=True)
 
     
     analyzed_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
@@ -139,6 +140,9 @@ class AnalysisResult(db.Model):
     
     def get_interview_questions(self):
         return json.loads(self.interview_questions) if self.interview_questions else []
+
+    def get_skill_gap_diff(self):
+        return json.loads(self.skill_gap_diff) if self.skill_gap_diff else {}
     
     def __repr__(self):
         return f'<AnalysisResult {self.id} - Score: {self.overall_score}>'
