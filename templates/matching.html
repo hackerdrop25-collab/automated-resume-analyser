@@ -637,6 +637,67 @@
                 </div>
 
                 <div class="section">
+                    <h3 class="section-title" style="color: var(--primary);">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2">
+                            </path>
+                        </svg>
+                        Skill Matching & Real-World Optimization
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div
+                            style="background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 1.5rem; border-radius: 16px;">
+                            <h4
+                                style="color: #4ade80; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase;">
+                                Matched Capabilities</h4>
+                            <div class="pill-list">
+                                {% for skill in data.analysis.matched_skills %}
+                                <div class="pill pill-green">{{ skill }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div
+                            style="background: rgba(248, 113, 113, 0.05); border: 1px solid rgba(248, 113, 113, 0.2); padding: 1.5rem; border-radius: 16px;">
+                            <h4
+                                style="color: #f87171; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase;">
+                                Identified Gaps</h4>
+                            <div class="pill-list">
+                                {% for skill in data.analysis.missing_skills %}
+                                <div class="pill pill-red">{{ skill }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if data.analysis.skill_gap_diff %}
+                    <div
+                        style="background: rgba(0, 242, 254, 0.03); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;">
+                        <h4
+                            style="color: var(--primary); font-size: 0.9rem; margin-bottom: 0.75rem; text-transform: uppercase;">
+                            Optimization Strategy</h4>
+                        <p style="color: #cbd5e1; line-height: 1.6; font-size: 0.95rem;">{{
+                            data.analysis.skill_gap_diff.optimization_advice }}</p>
+
+                        {% if data.analysis.skill_gap_diff.bonus_skills_found %}
+                        <div style="margin-top: 1rem;">
+                            <p
+                                style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem; font-weight: 600;">
+                                BONUS FOUND:</p>
+                            <div class="pill-list">
+                                {% for bonus in data.analysis.skill_gap_diff.bonus_skills_found %}
+                                <div class="pill" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.2);">{{
+                                    bonus }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="section">
                     <h3 class="section-title">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24" style="color: var(--primary);">

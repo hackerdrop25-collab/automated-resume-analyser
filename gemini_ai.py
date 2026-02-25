@@ -158,7 +158,8 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
         "skill_gap_diff": {{
             "core_mismatch": ["major gaps"],
             "bonus_skills_found": ["extra skills candidate has that are useful"],
-            "optimization_advice": "Actionable steps to 'create' the matching resume version"
+            "optimization_advice": "Actionable steps to 'create' the matching resume version",
+            "optimized_summary": "A 3-4 sentence professional summary of the candidate, perfectly tuned for THIS role, ready to be copied into their resume."
         }},
         "interview_questions": [
             {{
