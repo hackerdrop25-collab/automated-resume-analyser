@@ -43,29 +43,47 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     # Re-configure if key was added after startup
     genai.configure(api_key=current_api_key)
 
-    # Handle PDF or DOCX
+    # Determine if we should use multimodal (Gemini native file analysis)
+    is_multimodal = filepath.lower().endswith(('.pdf', '.png', '.jpg', '.jpeg'))
+    
     resume_text = ""
-    if filepath.lower().endswith('.pdf'):
-        resume_text = extract_text_from_pdf(filepath)
-    elif filepath.lower().endswith('.docx'):
+    file_part = None
+
+    if is_multimodal:
+        try:
+            # Upload the file to Gemini for native processing (OCR + Layout)
+            mime_type = 'application/pdf' if filepath.lower().endswith('.pdf') else 'image/jpeg'
+            if filepath.lower().endswith('.png'): mime_type = 'image/png'
+            
+            uploaded_file = genai.upload_file(filepath, mime_type=mime_type)
+            file_part = uploaded_file
+            resume_text = "[File uploaded for multimodal analysis]"
+        except Exception as e:
+            print(f"Error uploading to Gemini: {e}")
+            # Fallback to text extraction for PDF if upload fails
+            if filepath.lower().endswith('.pdf'):
+                resume_text = extract_text_from_pdf(filepath)
+    
+    # Legacy extraction for DOCX
+    if not file_part and filepath.lower().endswith('.docx'):
         try:
             from docx import Document
             doc = Document(filepath)
             resume_text = "\n".join([para.text for para in doc.paragraphs])
         except Exception as e:
             print(f"Error extracting DOCX: {e}")
-            
-    if not resume_text:
+
+    if not file_part and not resume_text:
         return {
             'filename': filename,
             'job_title': job_title,
-            'summary': "Error: Could not extract text from this resume.",
+            'summary': "Error: Could not extract content from this resume.",
             'score': 0,
             'key_metrics': {'technical_match': 0, 'experience_match': 0, 'formatting_score': 0},
             'skills_analysis': {'matched_technical_skills': [], 'missing_critical_skills': [], 'soft_skills_detected': []},
             'strengths': [],
             'weaknesses': [],
-            'recommendations': ["Ensure the file is a valid PDF or DOCX."],
+            'recommendations': ["Ensure the file is a valid PDF, DOCX, or Image (JPG/PNG)."],
             'interview_questions': []
         }
 
@@ -81,6 +99,8 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     3. ONLY include projects with relevance score > 60%
     4. Calculate "Experience Match" based on required {experience} years vs. actual experience
     5. Evaluate "Advanced Source Match" by inferring quality from GitHub links, Portfolio URLs, or Company Reputations mentioned.
+    6. SKILL GAP ANALYSIS: Explicitly compare the candidate's skills with the requirements of "{job_title}".
+    7. OPTIMIZATION STRATEGY: Provide specific, actionable advice on how the candidate can "create" or modify their resume to better match this specific deployment/role.
 
     Job Profile:
     - Role: {job_title}
@@ -89,7 +109,7 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     - Detailed Requirements: {project_description}
     
     Resume Content:
-    {resume_text}
+    {resume_text if not file_part else "The resume is provided as an attached file (PDF/Image). Analyze its full content visually and contextually."}
     
     IMPORTANT: For each project in the resume, evaluate if it's relevant to "{job_title}". 
     Only include projects that directly relate to the job requirements.
@@ -98,48 +118,53 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
     {{
         "filename": "{filename}",
         "job_title": "{job_title}",
-        "summary": "3-4 sentence professional summary of fit, including a note on 'Advanced Source Verification' (e.g. 'GitHub profile indicates strong open source contribution...').",
+        "summary": "3-4 sentence professional summary of fit, including a note on 'Advanced Source Verification'.",
         "score": (0-100 overall score),
         "key_metrics": {{
             "technical_match": (0-100),
             "experience_match": (0-100),
             "formatting_score": (0-100),
-            "advanced_source_match": (0-100, inferred from links/depth),
-            "soft_skills_score": (0-100, based on detected soft skills depth)
+            "advanced_source_match": (0-100),
+            "soft_skills_score": (0-100)
         }},
         "resume_data": {{
-            "name": "Candidate Name (if found)",
-            "email": "Candidate Email (if found)",
-            "education": ["list of education entries"],
-            "full_experience": ["list of recent job roles and key responsibilities"],
-            "certifications_found": ["list of certifications found in resume"]
+            "name": "Candidate Name",
+            "email": "Candidate Email",
+            "education": ["list"],
+            "full_experience": ["list"],
+            "certifications_found": ["list"]
         }},
         "skills_analysis": {{
-            "matched_technical_skills": ["list", "of", "skills"],
-            "missing_critical_skills": ["list", "of", "missing"],
-            "soft_skills_detected": ["list", "of", "soft", "skills"]
+            "matched_technical_skills": ["skills found that match JD"],
+            "missing_critical_skills": ["skills in JD but missing in resume"],
+            "soft_skills_detected": ["soft skills list"]
         }},
         "relevant_projects": [
             {{
-                "project_name": "Name of the project",
-                "relevance_score": (0-100, only include if > 60),
-                "description": "Brief description of what the project does",
-                "technologies": ["tech1", "tech2"],
-                "role_match_reason": "Why this project is relevant to {job_title}"
+                "project_name": "Name",
+                "relevance_score": (0-100),
+                "description": "Brief description",
+                "technologies": ["list"],
+                "role_match_reason": "Why"
             }}
         ],
-        "career_trajectory": "1-2 sentence prediction of the candidate's future growth and potential roles.",
-        "red_flags": ["list of potential concerns, e.g. frequent job hopping, gaps without explanation, skill mismatch"],
-        "filtered_project_count": (number of relevant projects included),
-        "total_project_count": (total number of projects found in resume),
-        "strengths": ["point 1", "point 2"],
-        "weaknesses": ["area 1", "area 2"],
-        "recommendations": ["advice 1", "advice 2"],
+        "career_trajectory": "Growth prediction.",
+        "red_flags": ["concerns"],
+        "filtered_project_count": (n),
+        "total_project_count": (n),
+        "strengths": ["point 1"],
+        "weaknesses": ["point 1"],
+        "recommendations": ["point 1"],
+        "skill_gap_diff": {{
+            "core_mismatch": ["major gaps"],
+            "bonus_skills_found": ["extra skills candidate has that are useful"],
+            "optimization_advice": "Actionable steps to 'create' the matching resume version"
+        }},
         "interview_questions": [
             {{
-                "question": "Strategic technical or behavioral question based on this specific resume's content",
-                "sample_solution": "The 'Sample Solution' (perfect answer) the recruiter should look for",
-                "logic": "The reasoning behind asking this specific question for this role"
+                "question": "question",
+                "sample_solution": "answer",
+                "logic": "reason"
             }}
         ]
     }}
@@ -147,7 +172,13 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
 
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
+        
+        # Prepare inputs: if we have a file_part, send [prompt, file_part], else [prompt]
+        inputs = [prompt]
+        if file_part:
+            inputs.append(file_part)
+            
+        response = model.generate_content(inputs)
         
         result_text = response.text.strip()
         # Remove any markdown code blocks
