@@ -167,6 +167,7 @@ def upload_resume():
                         career_trajectory=analysis.get('career_trajectory'),
                         red_flags=json.dumps(analysis.get('red_flags', [])),
                         interview_questions=json.dumps(analysis.get('interview_questions', [])),
+                        skill_gap_diff=json.dumps(analysis.get('skill_gap_diff', {})),
                         filtered_project_count=analysis.get('filtered_project_count', 0),
                         total_project_count=analysis.get('total_project_count', 0)
                     )
@@ -196,7 +197,8 @@ def upload_resume():
                         'candidate_email': resume_data.get('email'),
                         'extracted_text': extracted_text,
                         'filtered_project_count': analysis.get('filtered_project_count', 0),
-                        'total_project_count': analysis.get('total_project_count', 0)
+                        'total_project_count': analysis.get('total_project_count', 0),
+                        'skill_gap_diff': analysis.get('skill_gap_diff', {})
                     }
                     
                     all_analyses.append({
@@ -288,7 +290,8 @@ def view_latest_results():
             'interview_questions': result.get_interview_questions(),
             'extracted_text': result.resume.extracted_text,
             'filtered_project_count': result.filtered_project_count,
-            'total_project_count': result.total_project_count
+            'total_project_count': result.total_project_count,
+            'skill_gap_diff': result.get_skill_gap_diff()
         }
         
         all_analyses.append({
@@ -328,7 +331,8 @@ def view_specific_result(resume_id):
         'interview_questions': result.get_interview_questions(),
         'extracted_text': result.resume.extracted_text,
         'filtered_project_count': result.filtered_project_count,
-        'total_project_count': result.total_project_count
+        'total_project_count': result.total_project_count,
+        'skill_gap_diff': result.get_skill_gap_diff()
     }
     
     all_analyses = [{
