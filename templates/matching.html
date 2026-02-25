@@ -903,24 +903,7 @@
     </div>
 
 
-    <script>
-        function copySummary(index) {
-            const textElement = document.getElementById('opt-summary-' + index);
-            const text = textElement.innerText.replace(/^"|"$/g, '');
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target;
-                const originalText = btn.innerText;
-                btn.innerText = 'Copied!';
-                btn.style.background = 'var(--primary)';
-                btn.style.color = '#020617';
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.background = 'rgba(255,255,255,0.1)';
-                    btn.style.color = 'white';
-                }, 2000);
-            });
-        }
-    </script>
+    </div>
 </body>
 
 <script>
@@ -988,6 +971,23 @@
 
     function closeModal(index) {
         document.getElementById(`modal-${index}`).style.display = 'none';
+    }
+
+    function copySummary(index) {
+        const textElement = document.getElementById('opt-summary-' + index);
+        const text = textElement.innerText.replace(/^"|"$/g, '');
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Copied!';
+            btn.style.background = 'var(--primary)';
+            btn.style.color = '#020617';
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = 'rgba(255,255,255,0.1)';
+                btn.style.color = 'white';
+            }, 2000);
+        });
     }
 </script>
 
