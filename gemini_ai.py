@@ -125,8 +125,10 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
             "experience_match": (0-100),
             "formatting_score": (0-100),
             "advanced_source_match": (0-100),
-            "soft_skills_score": (0-100)
+            "soft_skills_score": (0-100),
+            "ats_score": (0-100)
         }},
+        "extracted_text": "The full, raw text content extracted from the resume file, preserving as much order as possible.",
         "resume_data": {{
             "name": "Candidate Name",
             "email": "Candidate Email",
@@ -189,7 +191,11 @@ def analyze_resume(filepath, job_title, experience, certifications, project_desc
                 result_text = result_text[4:].strip()
         
         result = json.loads(result_text)
-        return result, resume_text
+        
+        # Use Gemini's extracted text if available
+        final_text = result.get('extracted_text', resume_text)
+        
+        return result, final_text
     except Exception as e:
         print(f"Error calling Gemini: {e}")
         raise e

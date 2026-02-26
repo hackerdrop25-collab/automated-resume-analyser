@@ -83,6 +83,7 @@ class AnalysisResult(db.Model):
     formatting_score = db.Column(db.Float, nullable=True)
     advanced_score = db.Column(db.Float, nullable=True)
     soft_skills_score = db.Column(db.Float, nullable=True, default=0)
+    ats_score = db.Column(db.Float, nullable=True, default=0)
     overall_score = db.Column(db.Float, nullable=True)
     
     summary = db.Column(db.Text, nullable=True)
