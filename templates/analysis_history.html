@@ -134,6 +134,7 @@
         .score-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: var(--width, 0%);
             transition: width 0.3s ease;
         }
 
@@ -209,27 +210,25 @@
         {% if analyses.items %}
         <div class="analysis-grid">
             {% for analysis in analyses.items %}
-            <a href="{{ url_for('view_analysis', analysis_id=analysis.id) }}"
-                style="text-decoration: none; color: inherit;">
-                <div class="analysis-card">
-                    <div class="resume-filename">{{ analysis.resume.original_filename }}</div>
-                    <div class="score-display">{{ "%.1f"|format(analysis.overall_score) }}%</div>
-                    <div class="score-bar">
-                        <div class="score-fill" style="width: {{ analysis.overall_score }}%"></div>
-                    </div>
-                    <div style="font-size: 0.9rem; color: #cbd5e1; margin: 0.5rem 0;">
-                        Technical: {{ "%.0f"|format(analysis.technical_score) }}%
-                        | Experience: {{ "%.0f"|format(analysis.experience_score) }}%
-                        | Format: {{ "%.0f"|format(analysis.formatting_score) }}%
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                        <div class="analysis-date">📅 {{ analysis.analyzed_at.strftime('%B %d, %Y') }}</div>
-                        <a href="/export/{{ analysis.id }}" onclick="event.stopPropagation()"
-                            style="background: rgba(0, 210, 255, 0.1); border-color: var(--primary); color: var(--primary); font-size: 0.75rem; padding: 4px 10px;">Export
-                            PDF</a>
-                    </div>
+            <div class="analysis-card"
+                onclick="location.href='{{ url_for('view_analysis', analysis_id=analysis.id) }}';">
+                <div class="resume-filename">{{ analysis.resume.original_filename }}</div>
+                <div class="score-display">{{ "%.1f"|format(analysis.overall_score) }}%</div>
+                <div class="score-bar">
+                    <div class="score-fill" style="--width: {{ " %.2f"|format(analysis.overall_score) }}%;"></div>
                 </div>
-            </a>
+                <div style="font-size: 0.9rem; color: #cbd5e1; margin: 0.5rem 0;">
+                    Technical: {{ "%.0f"|format(analysis.technical_score) }}%
+                    | Experience: {{ "%.0f"|format(analysis.experience_score) }}%
+                    | Format: {{ "%.0f"|format(analysis.formatting_score) }}%
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div class="analysis-date">📅 {{ analysis.analyzed_at.strftime('%B %d, %Y') }}</div>
+                    <a href="/export/{{ analysis.id }}" onclick="event.stopPropagation()"
+                        style="background: rgba(0, 210, 255, 0.1); border-color: var(--primary); color: var(--primary); font-size: 0.75rem; padding: 4px 10px; z-index: 10; position: relative;">Export
+                        PDF</a>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
