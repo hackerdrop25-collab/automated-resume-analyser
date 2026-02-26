@@ -138,6 +138,7 @@ def upload_resume():
                     fmt_score = metrics.get('formatting_score', 0)
                     adv_score = metrics.get('advanced_source_match', 0)
                     soft_score = metrics.get('soft_skills_score', 0)
+                    ats_score = metrics.get('ats_score', 0)
                     
                     strengths_list = analysis.get('strengths', [])
                     if adv_score > 0:
@@ -151,6 +152,7 @@ def upload_resume():
                         formatting_score=fmt_score,
                         advanced_score=adv_score,
                         soft_skills_score=soft_score,
+                        ats_score=ats_score,
                         overall_score=overall_score,
                         summary=analysis.get('summary'),
                         strengths=json.dumps(strengths_list),
@@ -180,6 +182,7 @@ def upload_resume():
                         'formatting_score': fmt_score,
                         'advanced_match': adv_score,
                         'soft_skills_score': soft_score,
+                        'ats_score': ats_score,
                         'summary': analysis.get('summary'),
                         'career_trajectory': analysis.get('career_trajectory'),
                         'red_flags': analysis.get('red_flags', []),
@@ -273,6 +276,7 @@ def view_latest_results():
             'formatting_score': result.formatting_score or 0,
             'advanced_match': result.advanced_score or 0,
             'soft_skills_score': result.soft_skills_score or 0,
+            'ats_score': result.ats_score or 0,
             'summary': result.summary,
             'strengths': result.get_strengths(),
             'weaknesses': result.get_weaknesses(),
@@ -314,6 +318,7 @@ def view_specific_result(resume_id):
         'formatting_score': result.formatting_score or 0,
         'advanced_match': result.advanced_score or 0,
         'soft_skills_score': result.soft_skills_score or 0,
+        'ats_score': result.ats_score or 0,
         'summary': result.summary,
         'strengths': result.get_strengths(),
         'weaknesses': result.get_weaknesses(),
@@ -359,6 +364,7 @@ def get_analysis_data(analysis_id):
         'formatting_score': analysis.formatting_score,
         'advanced_match': analysis.advanced_score,
         'soft_skills_score': analysis.soft_skills_score,
+        'ats_score': analysis.ats_score,
         'summary': analysis.summary,
         'strengths': analysis.get_strengths(),
         'weaknesses': analysis.get_weaknesses(),
@@ -400,6 +406,84 @@ def not_found(error):
 def server_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
+
+@app.route('/export/<int:analysis_id>')
+@login_required
+def export_analysis(analysis_id):
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+    from io import BytesIO
+    from flask import send_file
+
+    result = AnalysisResult.query.filter_by(id=analysis_id, user_id=current_user.id).first_or_404()
+    
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+    
+    # Title
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(50, height - 50, f"Resume Analysis Report: {result.candidate_name or result.resume.original_filename}")
+    
+    c.setFont("Helvetica", 10)
+    c.drawRightString(width - 50, height - 50, f"Date: {result.analyzed_at.strftime('%Y-%m-%d')}")
+    c.line(50, height - 60, width - 50, height - 60)
+    
+    y = height - 80
+    
+    # Overall Score
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(50, y, f"Overall Compatibility: {result.overall_score}%")
+    y -= 25
+    
+    # Metrics
+    c.setFont("Helvetica", 11)
+    metrics = [
+        f"Technical Precision: {result.technical_score}%",
+        f"Relevant Tenure: {result.experience_score}%",
+        f"ATS Compatibility: {result.ats_score}%",
+        f"Soft Skills Score: {result.soft_skills_score}%"
+    ]
+    for m in metrics:
+        c.drawString(70, y, f"- {m}")
+        y -= 15
+    y -= 10
+    
+    # Summary
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, y, "Executive Summary")
+    y -= 15
+    c.setFont("Helvetica", 10)
+    text = c.beginText(50, y)
+    text.setLeading(14)
+    lines = result.summary.split('.')
+    for line in lines:
+        if line.strip():
+            text.textLine(line.strip() + ".")
+    c.drawText(text)
+    
+    # Update y based on summary length
+    y -= (len(lines) * 15) + 20
+    
+    # Gaps & Optimization
+    gap_diff = result.get_skill_gap_diff()
+    if gap_diff:
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(50, y, "Optimization Strategy")
+        y -= 15
+        c.setFont("Helvetica", 10)
+        advice = gap_diff.get('optimization_advice', '')
+        text = c.beginText(50, y)
+        text.setLeading(14)
+        for line in advice.split('\n'):
+            text.textLine(line)
+        c.drawText(text)
+        
+    c.showPage()
+    c.save()
+    
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name=f"analysis_{analysis_id}.pdf", mimetype='application/pdf')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
