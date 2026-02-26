@@ -484,422 +484,431 @@
     </div>
 
     <div class="main-content">
-        <div class="top-nav">
+        <div style="display: flex; gap: 1rem;">
+            <a href="/export/{{ data.analysis_id }}" class="btn-back"
+                style="background: rgba(0, 242, 254, 0.1); border-color: var(--primary); color: var(--primary);">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                Export Report
+            </a>
             <a href="/dashboard" class="btn-back">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M19 12H5m7-7l-7 7 7 7"></path>
                 </svg>
                 Exit to Dashboard
             </a>
-            <div id="active-filename" style="font-weight: 600; font-size: 1.1rem;">{{ analyses[0].resume_filename if
-                analyses else '' }}</div>
         </div>
+    </div>
+    <div id="active-filename"
+        style="font-weight: 600; font-size: 1.1rem; margin-top: 1rem; text-align: center; color: var(--text-muted);">
+        Showing Analysis for: {{ analyses[0].resume_filename if analyses else '' }}</div>
+    </div>
 
-        <div id="panels-container">
-            {% if analyses %}
-            {% for data in analyses %}
-            <div class="analysis-panel {% if loop.first %}active{% endif %}" id="panel-{{ loop.index0 }}">
-                <div class="hero-section">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div>
-                            <h1 id="panel-name-{{ loop.index0 }}" class="candidate-name" data-index="{{ loop.index0 }}"
-                                style="cursor: pointer;">{{
-                                data.analysis.candidate_name|default(data.resume_filename) }}</h1>
-                            <p style="color: var(--primary); font-weight: 600;">{{
-                                data.analysis.candidate_email|default('No email found') }}</p>
-                            <p style="color: var(--text-muted); margin-top: 0.5rem;">Targeting: {{
-                                data.analysis.job_title|default('Not specified') }}</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="color: var(--text-muted); font-size: 0.8rem;">Analyzed on {{
-                                data.analysis.analyzed_at|default('Recent') }}</p>
-                        </div>
+    <div id="panels-container">
+        {% if analyses %}
+        {% for data in analyses %}
+        <div class="analysis-panel {% if loop.first %}active{% endif %}" id="panel-{{ loop.index0 }}">
+            <div class="hero-section">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1 id="panel-name-{{ loop.index0 }}" class="candidate-name" data-index="{{ loop.index0 }}"
+                            style="cursor: pointer;">{{
+                            data.analysis.candidate_name|default(data.resume_filename) }}</h1>
+                        <p style="color: var(--primary); font-weight: 600;">{{
+                            data.analysis.candidate_email|default('No email found') }}</p>
+                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Targeting: {{
+                            data.analysis.job_title|default('Not specified') }}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Analyzed on {{
+                            data.analysis.analyzed_at|default('Recent') }}</p>
                     </div>
                 </div>
+            </div>
 
-                <div id="modal-{{ loop.index0 }}" class="modal-overlay">
-                    <div class="modal-content">
-                        <span class="close-modal" onclick="closeModal('{{ loop.index0 }}')">✕</span>
-                        <h2 style="font-size: 1.5rem;">Raw Extracted Text</h2>
-                        <div class="modal-body">
-                            {{ data.analysis.extracted_text|default('No text extracted') }}
-                        </div>
+            <div id="modal-{{ loop.index0 }}" class="modal-overlay">
+                <div class="modal-content">
+                    <span class="close-modal" onclick="closeModal('{{ loop.index0 }}')">✕</span>
+                    <h2 style="font-size: 1.5rem;">Raw Extracted Text</h2>
+                    <div class="modal-body">
+                        {{ data.analysis.extracted_text|default('No text extracted') }}
                     </div>
                 </div>
+            </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="progress-ring">
-                            <svg width="120" height="120">
-                                <circle cx="60" cy="60" r="54"></circle>
-                                <circle class="progress progress-ring-circle" cx="60" cy="60" r="54"
-                                    style="--offset: {{ 339.292 * (1 - (data.analysis.overall_score|default(0)) / 100) }}">
-                                </circle>
-                            </svg>
-                            <div style="position: absolute; font-size: 1.5rem; font-weight: 700;">{{
-                                data.analysis.overall_score|default(0) }}%</div>
-                        </div>
-                        <div class="stat-label">Overall Compatibility</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="progress-ring">
+                        <svg width="120" height="120">
+                            <circle cx="60" cy="60" r="54"></circle>
+                            <circle class="progress progress-ring-circle" cx="60" cy="60" r="54"
+                                style="--offset: {{ 339.292 * (1 - (data.analysis.overall_score|default(0)) / 100) }}">
+                            </circle>
+                        </svg>
+                        <div style="position: absolute; font-size: 1.5rem; font-weight: 700;">{{
+                            data.analysis.overall_score|default(0) }}%</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ data.analysis.technical_score|default(0) }}%</div>
-                        <div class="stat-label">Technical Precision</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ data.analysis.experience_score|default(0) }}%</div>
-                        <div class="stat-label">Relevant Tenure</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" style="color: var(--primary);">{{
-                            data.analysis.advanced_match|default(0) }}%</div>
-                        <div class="stat-label">Advanced Verification</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" style="color: #4ade80;">{{
-                            data.analysis.soft_skills_score|default(0) }}%</div>
-                        <div class="stat-label">Soft Skills</div>
-                    </div>
+                    <div class="stat-label">Overall Compatibility</div>
                 </div>
-
-                <div class="chart-section">
-                    <div class="radar-container">
-                        <h3 class="section-title" style="font-size: 1rem; justify-content: center;">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
-                                <path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
-                            </svg>
-                            Real-World Capability Map
-                        </h3>
-                        <canvas id="radar-{{ loop.index0 }}" class="radar-chart"
-                            data-scores='[{{ data.analysis.technical_score|default(0) }}, {{ data.analysis.experience_score|default(0) }}, {{ data.analysis.formatting_score|default(0) }}, {{ data.analysis.advanced_match|default(0) }}, {{ data.analysis.soft_skills_score|default(0) }}]'></canvas>
-                    </div>
-                    <div class="section" style="margin-bottom: 0;">
-                        <h3 class="section-title">Executive Summary</h3>
-                        <p class="summary-text" style="font-size: 0.95rem;">{{ data.analysis.summary }}</p>
-                    </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ data.analysis.technical_score|default(0) }}%</div>
+                    <div class="stat-label">Technical Precision</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ data.analysis.experience_score|default(0) }}%</div>
+                    <div class="stat-label">Relevant Tenure</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--primary);">{{
+                        data.analysis.advanced_match|default(0) }}%</div>
+                    <div class="stat-label">Advanced Verification</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #fbbf24;">{{ data.analysis.ats_score|default(0) }}%</div>
+                    <div class="stat-label">ATS Compatibility</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #4ade80;">{{
+                        data.analysis.soft_skills_score|default(0) }}%</div>
+                    <div class="stat-label">Soft Skills</div>
+                </div>
+            </div>
 
-                <div class="trajectory-card">
-                    <h3 class="section-title">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+            <div class="chart-section">
+                <div class="radar-container">
+                    <h3 class="section-title" style="font-size: 1rem; justify-content: center;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
-                            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            <path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                            <path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
                         </svg>
-                        Career Trajectory & Potential
+                        Real-World Capability Map
                     </h3>
-                    <p style="color: #e2e8f0; line-height: 1.6; font-style: italic;">"{{
-                        data.analysis.career_trajectory|default('Insufficient data for projection.') }}"</p>
+                    <canvas id="radar-{{ loop.index0 }}" class="radar-chart"
+                        data-scores='[{{ data.analysis.technical_score|default(0) }}, {{ data.analysis.experience_score|default(0) }}, {{ data.analysis.ats_score|default(0) }}, {{ data.analysis.advanced_match|default(0) }}, {{ data.analysis.soft_skills_score|default(0) }}]'></canvas>
                 </div>
-
-                <div class="section">
-                    <h3 class="section-title">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24" style="color: var(--primary);">
-                            <path
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                            </path>
-                        </svg>
-                        Professional Experience
-                    </h3>
-                    <div style="display: grid; gap: 1rem;">
-                        {% for exp in data.analysis.experience %}
-                        <div
-                            style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border);">
-                            <p style="color: #e2e8f0; line-height: 1.6;">{{ exp }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
+                <div class="section" style="margin-bottom: 0;">
+                    <h3 class="section-title">Executive Summary</h3>
+                    <p class="summary-text" style="font-size: 0.95rem;">{{ data.analysis.summary }}</p>
                 </div>
+            </div>
 
-                <div class="section">
-                    <h3 class="section-title">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24" style="color: var(--primary);">
-                            <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
-                            <path
-                                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
-                            </path>
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222">
-                            </path>
-                        </svg>
-                        Education & Certifications
-                    </h3>
-                    <div style="display: grid; gap: 1rem;">
-                        {% for edu in data.analysis.education %}
-                        <div
-                            style="background: rgba(0, 242, 254, 0.03); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--primary);">
-                            <p style="color: #cbd5e1;">{{ edu }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+            <div class="trajectory-card">
+                <h3 class="section-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    Career Trajectory & Potential
+                </h3>
+                <p style="color: #e2e8f0; line-height: 1.6; font-style: italic;">"{{
+                    data.analysis.career_trajectory|default('Insufficient data for projection.') }}"</p>
+            </div>
 
-                <div class="section">
-                    <h3 class="section-title" style="color: var(--primary);">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2">
-                            </path>
-                        </svg>
-                        Skill Matching & Real-World Optimization
-                    </h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                        <div
-                            style="background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 1.5rem; border-radius: 16px;">
-                            <h4
-                                style="color: #4ade80; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase;">
-                                Matched Capabilities</h4>
-                            <div class="pill-list">
-                                {% for skill in data.analysis.matched_skills %}
-                                <div class="pill pill-green">{{ skill }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div
-                            style="background: rgba(248, 113, 113, 0.05); border: 1px solid rgba(248, 113, 113, 0.2); padding: 1.5rem; border-radius: 16px;">
-                            <h4
-                                style="color: #f87171; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase;">
-                                Identified Gaps</h4>
-                            <div class="pill-list">
-                                {% for skill in data.analysis.missing_skills %}
-                                <div class="pill pill-red">{{ skill }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    {% if data.analysis.skill_gap_diff %}
+            <div class="section">
+                <h3 class="section-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        style="color: var(--primary);">
+                        <path
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                        </path>
+                    </svg>
+                    Professional Experience
+                </h3>
+                <div style="display: grid; gap: 1rem;">
+                    {% for exp in data.analysis.experience %}
                     <div
-                        style="background: rgba(0, 242, 254, 0.03); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;">
-                        <h4
-                            style="color: var(--primary); font-size: 0.9rem; margin-bottom: 0.75rem; text-transform: uppercase;">
-                            Optimization Strategy</h4>
-                        <p style="color: #cbd5e1; line-height: 1.6; font-size: 0.95rem;">{{
-                            data.analysis.skill_gap_diff.optimization_advice }}</p>
-
-                        {% if data.analysis.skill_gap_diff.bonus_skills_found %}
-                        <div style="margin-top: 1rem;">
-                            <p
-                                style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem; font-weight: 600;">
-                                BONUS FOUND:</p>
-                            <div class="pill-list">
-                                {% for bonus in data.analysis.skill_gap_diff.bonus_skills_found %}
-                                <div class="pill" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.2);">{{
-                                    bonus }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
+                        style="background: rgba(255, 255, 255, 0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <p style="color: #e2e8f0; line-height: 1.6;">{{ exp }}</p>
                     </div>
+                    {% endfor %}
+                </div>
+            </div>
 
-                    {% if data.analysis.skill_gap_diff.optimized_summary %}
+            <div class="section">
+                <h3 class="section-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        style="color: var(--primary);">
+                        <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                        <path
+                            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222">
+                        </path>
+                    </svg>
+                    Education & Certifications
+                </h3>
+                <div style="display: grid; gap: 1rem;">
+                    {% for edu in data.analysis.education %}
                     <div
-                        style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(79, 172, 254, 0.1)); border: 1px solid var(--primary); padding: 1.5rem; border-radius: 16px; position: relative; overflow: hidden; margin-bottom: 1.5rem;">
-                        <h4
-                            style="color: #ffffff; font-size: 0.95rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                </path>
-                            </svg>
-                            Targeted Profile Summary (Optimized)
-                        </h4>
-                        <p style="color: #ffffff; line-height: 1.7; font-size: 1rem; font-style: italic;"
-                            id="opt-summary-{{ loop.index0 }}">"{{ data.analysis.skill_gap_diff.optimized_summary }}"
-                        </p>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                            <p
-                                style="color: var(--primary); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                                Copy this to your resume to instantly improve match</p>
-                            <button onclick="copySummary('{{ loop.index0 }}')"
-                                style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">Copy
-                                Text</button>
-                        </div>
+                        style="background: rgba(0, 242, 254, 0.03); padding: 1rem; border-radius: 10px; border-left: 3px solid var(--primary);">
+                        <p style="color: #cbd5e1;">{{ edu }}</p>
                     </div>
-                    {% endif %}
-                    {% endif %}
+                    {% endfor %}
                 </div>
+            </div>
 
-                <div class="section">
-                    <h3 class="section-title">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24" style="color: var(--primary);">
-                            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                        </svg>
-                        Matching Projects ({{ data.analysis.filtered_project_count|default(0) }}/{{
-                        data.analysis.total_project_count|default(0) }})
-                    </h3>
-                    <div style="display: grid; gap: 1.5rem;">
-                        {% for project in data.analysis.relevant_projects %}
-                        <div class="project-card">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <h4 style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">{{ project.project_name
-                                    }}</h4>
-                                <div class="{% if project.relevance_score >= 90 %}score-gradient-high{% elif project.relevance_score >= 75 %}score-gradient-med{% else %}score-gradient-low{% endif %}"
-                                    style="padding: 0.4rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: #020617;">
-                                    {{ project.relevance_score }}% Match
-                                </div>
-                            </div>
-                            <p style="color: #cbd5e1; line-height: 1.6; margin-bottom: 1rem;">{{ project.description }}
-                            </p>
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                                {% for tech in project.technologies %}
-                                <span
-                                    style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); color: var(--primary); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem;">{{
-                                    tech }}</span>
-                                {% endfor %}
-                            </div>
-                            <div
-                                style="background: rgba(0, 242, 254, 0.05); border-left: 2px solid var(--primary); padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #e2e8f0;">
-                                {{ project.role_match_reason }}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="list-container">
-                    <div class="section">
-                        <h3 class="section-title" style="color: #4ade80;">Core Strengths</h3>
+            <div class="section">
+                <h3 class="section-title" style="color: var(--primary);">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2">
+                        </path>
+                    </svg>
+                    Skill Matching & Real-World Optimization
+                </h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div
+                        style="background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); padding: 1.5rem; border-radius: 16px;">
+                        <h4 style="color: #4ade80; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase;">
+                            Matched Capabilities</h4>
                         <div class="pill-list">
-                            {% if data.analysis.strengths is string %}
-                            {% set strengths = data.analysis.strengths|from_json %}
-                            {% else %}
-                            {% set strengths = data.analysis.strengths %}
-                            {% endif %}
-
-                            {% for strength in strengths %}
-                            <div class="pill pill-green">{{ strength }}</div>
+                            {% for skill in data.analysis.matched_skills %}
+                            <div class="pill pill-green">{{ skill }}</div>
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="section">
-                        <h3 class="section-title" style="color: #f87171;">Optimization Items</h3>
-                        <div class="pill-list" style="margin-bottom: 1.5rem;">
-                            {% if data.analysis.weaknesses is string %}
-                            {% set weaknesses = data.analysis.weaknesses|from_json %}
-                            {% else %}
-                            {% set weaknesses = data.analysis.weaknesses %}
-                            {% endif %}
-
-                            {% for weakness in weaknesses %}
-                            <div class="pill pill-red">{{ weakness }}</div>
+                    <div
+                        style="background: rgba(248, 113, 113, 0.05); border: 1px solid rgba(248, 113, 113, 0.2); padding: 1.5rem; border-radius: 16px;">
+                        <h4 style="color: #f87171; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase;">
+                            Identified Gaps</h4>
+                        <div class="pill-list">
+                            {% for skill in data.analysis.missing_skills %}
+                            <div class="pill pill-red">{{ skill }}</div>
                             {% endfor %}
                         </div>
-
-                        {% if data.analysis.red_flags %}
-                        <h4
-                            style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #f87171; text-transform: uppercase; letter-spacing: 1px;">
-                            Red Flags</h4>
-                        <div class="red-flag-list">
-                            {% for flag in data.analysis.red_flags %}
-                            <div class="red-flag-item">{{ flag }}</div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
 
-                <div class="section">
-                    <h3 class="section-title" style="color: #a855f7;">Detected Soft Skills</h3>
-                    <div class="pill-list">
-                        {% if data.analysis.soft_skills is string %}
-                        {% set soft_skills = data.analysis.soft_skills|from_json %}
-                        {% else %}
-                        {% set soft_skills = data.analysis.soft_skills %}
-                        {% endif %}
+                {% if data.analysis.skill_gap_diff %}
+                <div
+                    style="background: rgba(0, 242, 254, 0.03); border: 1px solid var(--glass-border); padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;">
+                    <h4
+                        style="color: var(--primary); font-size: 0.9rem; margin-bottom: 0.75rem; text-transform: uppercase;">
+                        Optimization Strategy</h4>
+                    <p style="color: #cbd5e1; line-height: 1.6; font-size: 0.95rem;">{{
+                        data.analysis.skill_gap_diff.optimization_advice }}</p>
 
-                        {% for skill in soft_skills %}
-                        <div class="pill" style="color: #d8b4fe; border-color: rgba(168, 85, 247, 0.2);">{{ skill }}
+                    {% if data.analysis.skill_gap_diff.bonus_skills_found %}
+                    <div style="margin-top: 1rem;">
+                        <p
+                            style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem; font-weight: 600;">
+                            BONUS FOUND:</p>
+                        <div class="pill-list">
+                            {% for bonus in data.analysis.skill_gap_diff.bonus_skills_found %}
+                            <div class="pill" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.2);">{{
+                                bonus }}</div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
+                    {% endif %}
                 </div>
 
-                <div class="section">
-                    <h3 class="section-title" style="color: var(--primary);">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                {% if data.analysis.skill_gap_diff.optimized_summary %}
+                <div
+                    style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.1), rgba(79, 172, 254, 0.1)); border: 1px solid var(--primary); padding: 1.5rem; border-radius: 16px; position: relative; overflow: hidden; margin-bottom: 1.5rem;">
+                    <h4
+                        style="color: #ffffff; font-size: 0.95rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
                             <path
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                             </path>
                         </svg>
-                        Interview Strategy & Sample Solutions
-                    </h3>
-                    <div style="display: grid; gap: 1.5rem;">
-                        {% for item in data.analysis.interview_questions %}
+                        Targeted Profile Summary (Optimized)
+                    </h4>
+                    <p style="color: #ffffff; line-height: 1.7; font-size: 1rem; font-style: italic;"
+                        id="opt-summary-{{ loop.index0 }}">"{{ data.analysis.skill_gap_diff.optimized_summary }}"
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <p
+                            style="color: var(--primary); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                            Copy this to your resume to instantly improve match</p>
+                        <button onclick="copySummary('{{ loop.index0 }}')"
+                            style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">Copy
+                            Text</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        style="color: var(--primary);">
+                        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    Matching Projects ({{ data.analysis.filtered_project_count|default(0) }}/{{
+                    data.analysis.total_project_count|default(0) }})
+                </h3>
+                <div style="display: grid; gap: 1.5rem;">
+                    {% for project in data.analysis.relevant_projects %}
+                    <div class="project-card">
                         <div
-                            style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem;">
-                            <div style="display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 1rem;">
-                                <span
-                                    style="background: var(--primary); color: #020617; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.75rem; margin-top: 0.2rem;">Q</span>
-                                <p style="color: #ffffff; font-weight: 600; font-size: 1rem; line-height: 1.5;">{{
-                                    item.question }}</p>
-                            </div>
-
-                            <div style="margin-left: 2.2rem;">
-                                <div style="margin-bottom: 1rem;">
-                                    <p
-                                        style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 0.5rem;">
-                                        Logic & Intent</p>
-                                    <p style="color: #94a3b8; font-size: 0.9rem; font-style: italic;">{{ item.logic }}
-                                    </p>
-                                </div>
-
-                                <div
-                                    style="background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 1.25rem;">
-                                    <div
-                                        style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"
-                                            style="color: var(--primary);">
-                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
-                                        </svg>
-                                        <p
-                                            style="color: var(--primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
-                                            Sample Solution (Ideal Answer)</p>
-                                    </div>
-                                    <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.6;">{{
-                                        item.sample_solution }}</p>
-                                </div>
+                            style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h4 style="font-size: 1.1rem; font-weight: 600; color: #ffffff;">{{ project.project_name
+                                }}</h4>
+                            <div class="{% if project.relevance_score >= 90 %}score-gradient-high{% elif project.relevance_score >= 75 %}score-gradient-med{% else %}score-gradient-low{% endif %}"
+                                style="padding: 0.4rem 0.9rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: #020617;">
+                                {{ project.relevance_score }}% Match
                             </div>
                         </div>
+                        <p style="color: #cbd5e1; line-height: 1.6; margin-bottom: 1rem;">{{ project.description }}
+                        </p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                            {% for tech in project.technologies %}
+                            <span
+                                style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.2); color: var(--primary); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem;">{{
+                                tech }}</span>
+                            {% endfor %}
+                        </div>
+                        <div
+                            style="background: rgba(0, 242, 254, 0.05); border-left: 2px solid var(--primary); padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #e2e8f0;">
+                            {{ project.role_match_reason }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="list-container">
+                <div class="section">
+                    <h3 class="section-title" style="color: #4ade80;">Core Strengths</h3>
+                    <div class="pill-list">
+                        {% if data.analysis.strengths is string %}
+                        {% set strengths = data.analysis.strengths|from_json %}
+                        {% else %}
+                        {% set strengths = data.analysis.strengths %}
+                        {% endif %}
+
+                        {% for strength in strengths %}
+                        <div class="pill pill-green">{{ strength }}</div>
                         {% endfor %}
                     </div>
                 </div>
-
                 <div class="section">
-                    <h3 class="section-title">Strategic Recommendations</h3>
-                    <ul style="list-style: none; color: #cbd5e1;">
-                        {% if data.analysis.recommendations is string %}
-                        {% set recs = data.analysis.recommendations|from_json %}
+                    <h3 class="section-title" style="color: #f87171;">Optimization Items</h3>
+                    <div class="pill-list" style="margin-bottom: 1.5rem;">
+                        {% if data.analysis.weaknesses is string %}
+                        {% set weaknesses = data.analysis.weaknesses|from_json %}
                         {% else %}
-                        {% set recs = data.analysis.recommendations %}
+                        {% set weaknesses = data.analysis.weaknesses %}
                         {% endif %}
 
-                        {% for rec in recs %}
-                        <li
-                            style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 12px;">
-                            <span style="color: var(--primary); font-weight: bold;">→</span>
-                            {{ rec }}
-                        </li>
+                        {% for weakness in weaknesses %}
+                        <div class="pill pill-red">{{ weakness }}</div>
                         {% endfor %}
-                    </ul>
+                    </div>
+
+                    {% if data.analysis.red_flags %}
+                    <h4
+                        style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #f87171; text-transform: uppercase; letter-spacing: 1px;">
+                        Red Flags</h4>
+                    <div class="red-flag-list">
+                        {% for flag in data.analysis.red_flags %}
+                        <div class="red-flag-item">{{ flag }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
-            {% else %}
-            <div style="text-align: center; padding: 5rem;">
-                <h2>No analysis data available.</h2>
-                <p style="margin-top: 1rem; color: var(--text-muted);">Please upload resumes to start the process.</p>
+
+            <div class="section">
+                <h3 class="section-title" style="color: #a855f7;">Detected Soft Skills</h3>
+                <div class="pill-list">
+                    {% if data.analysis.soft_skills is string %}
+                    {% set soft_skills = data.analysis.soft_skills|from_json %}
+                    {% else %}
+                    {% set soft_skills = data.analysis.soft_skills %}
+                    {% endif %}
+
+                    {% for skill in soft_skills %}
+                    <div class="pill" style="color: #d8b4fe; border-color: rgba(168, 85, 247, 0.2);">{{ skill }}
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            {% endif %}
+
+            <div class="section">
+                <h3 class="section-title" style="color: var(--primary);">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                        </path>
+                    </svg>
+                    Interview Strategy & Sample Solutions
+                </h3>
+                <div style="display: grid; gap: 1.5rem;">
+                    {% for item in data.analysis.interview_questions %}
+                    <div
+                        style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem;">
+                        <div style="display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 1rem;">
+                            <span
+                                style="background: var(--primary); color: #020617; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.75rem; margin-top: 0.2rem;">Q</span>
+                            <p style="color: #ffffff; font-weight: 600; font-size: 1rem; line-height: 1.5;">{{
+                                item.question }}</p>
+                        </div>
+
+                        <div style="margin-left: 2.2rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <p
+                                    style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 0.5rem;">
+                                    Logic & Intent</p>
+                                <p style="color: #94a3b8; font-size: 0.9rem; font-style: italic;">{{ item.logic }}
+                                </p>
+                            </div>
+
+                            <div
+                                style="background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 1.25rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"
+                                        style="color: var(--primary);">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
+                                    </svg>
+                                    <p
+                                        style="color: var(--primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                                        Sample Solution (Ideal Answer)</p>
+                                </div>
+                                <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.6;">{{
+                                    item.sample_solution }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Strategic Recommendations</h3>
+                <ul style="list-style: none; color: #cbd5e1;">
+                    {% if data.analysis.recommendations is string %}
+                    {% set recs = data.analysis.recommendations|from_json %}
+                    {% else %}
+                    {% set recs = data.analysis.recommendations %}
+                    {% endif %}
+
+                    {% for rec in recs %}
+                    <li
+                        style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 12px;">
+                        <span style="color: var(--primary); font-weight: bold;">→</span>
+                        {{ rec }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+        {% endfor %}
+        {% else %}
+        <div style="text-align: center; padding: 5rem;">
+            <h2>No analysis data available.</h2>
+            <p style="margin-top: 1rem; color: var(--text-muted);">Please upload resumes to start the process.</p>
+        </div>
+        {% endif %}
+    </div>
     </div>
 
 
