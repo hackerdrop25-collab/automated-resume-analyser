@@ -209,7 +209,8 @@
         {% if analyses.items %}
         <div class="analysis-grid">
             {% for analysis in analyses.items %}
-            <a href="{{ url_for('view_analysis', analysis_id=analysis.id) }}" style="text-decoration: none; color: inherit;">
+            <a href="{{ url_for('view_analysis', analysis_id=analysis.id) }}"
+                style="text-decoration: none; color: inherit;">
                 <div class="analysis-card">
                     <div class="resume-filename">{{ analysis.resume.original_filename }}</div>
                     <div class="score-display">{{ "%.1f"|format(analysis.overall_score) }}%</div>
@@ -221,8 +222,11 @@
                         | Experience: {{ "%.0f"|format(analysis.experience_score) }}%
                         | Format: {{ "%.0f"|format(analysis.formatting_score) }}%
                     </div>
-                    <div class="analysis-date">
-                        📅 {{ analysis.analyzed_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <div class="analysis-date">📅 {{ analysis.analyzed_at.strftime('%B %d, %Y') }}</div>
+                        <a href="/export/{{ analysis.id }}" onclick="event.stopPropagation()"
+                            style="background: rgba(0, 210, 255, 0.1); border-color: var(--primary); color: var(--primary); font-size: 0.75rem; padding: 4px 10px;">Export
+                            PDF</a>
                     </div>
                 </div>
             </a>
@@ -236,15 +240,15 @@
             {% endif %}
 
             {% for page_num in analyses.iter_pages() %}
-                {% if page_num %}
-                    {% if page_num == analyses.page %}
-                    <span class="active">{{ page_num }}</span>
-                    {% else %}
-                    <a href="{{ url_for('analysis_history', page=page_num) }}">{{ page_num }}</a>
-                    {% endif %}
-                {% else %}
-                <span>...</span>
-                {% endif %}
+            {% if page_num %}
+            {% if page_num == analyses.page %}
+            <span class="active">{{ page_num }}</span>
+            {% else %}
+            <a href="{{ url_for('analysis_history', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+            {% else %}
+            <span>...</span>
+            {% endif %}
             {% endfor %}
 
             {% if analyses.has_next %}
@@ -258,7 +262,8 @@
             <div class="empty-state-icon">📭</div>
             <h2>No Analysis History</h2>
             <p>You haven't analyzed any resumes yet.</p>
-            <a href="{{ url_for('upload_resume') }}" style="display: inline-block; margin-top: 1rem;">Start Analyzing</a>
+            <a href="{{ url_for('upload_resume') }}" style="display: inline-block; margin-top: 1rem;">Start
+                Analyzing</a>
         </div>
         {% endif %}
     </div>
