@@ -214,7 +214,8 @@
                 <div class="resume-filename">{{ analysis.resume.original_filename }}</div>
                 <div class="score-display">{{ "%.1f"|format(analysis.overall_score) }}%</div>
                 <div class="score-bar">
-                    <div class="score-fill" style="--width: {{ " %.2f"|format(analysis.overall_score) }}%;"></div>
+                    <div class="score-fill" style="--width: calc({{ " %.2f"|format(analysis.overall_score) }} * 1%);">
+                    </div>
                 </div>
                 <div style="font-size: 0.9rem; color: #cbd5e1; margin: 0.5rem 0;">
                     Technical: {{ "%.0f"|format(analysis.technical_score) }}%
