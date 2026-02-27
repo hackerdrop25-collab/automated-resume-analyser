@@ -134,7 +134,7 @@
         .score-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: var(--width, 0%);
+            width: 0%;
             transition: width 0.3s ease;
         }
 
@@ -267,11 +267,19 @@
         {% endif %}
     </div>
     <script>
-        document.querySelectorAll('.analysis-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                // Don't navigate if clicking the export button
-                if (e.target.classList.contains('export-btn')) return;
-                window.location.href = card.dataset.url;
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize score bars
+            document.querySelectorAll('.score-fill').forEach(fill => {
+                const score = fill.dataset.score || 0;
+                fill.style.width = score + '%';
+            });
+
+            // Card navigation
+            document.querySelectorAll('.analysis-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('export-btn')) return;
+                    window.location.href = card.dataset.url;
+                });
             });
         });
     </script>
